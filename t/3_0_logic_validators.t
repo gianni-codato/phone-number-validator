@@ -90,7 +90,7 @@ $validatorResult = $validator->validate($pn);
 is(blessed($validatorResult), 'Logic::ValidatorResult');
 is($validatorResult->resultType, 'CORRECTED', 'Standard validator - corrected - type');
 is($validatorResult->resultCode, 'C2', 'Standard validator - corrected - code');
-diag(Dumper($validatorResult));
+# diag(Dumper($validatorResult));
 
 
 done_testing();

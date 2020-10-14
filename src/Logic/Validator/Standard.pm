@@ -71,7 +71,8 @@ sub buildValidatorResult
     my $result_type = $type_mapping->{substr($result_code, 0, 1)};
     my $result_description = $code_descriptions->{$result_code};
     if (defined($params))
-    {   $result_description = sprintf($result_description, @$params);        
+    {   no warnings 'redundant'; # suppress "Redundant argument in sprintf at ...": known and unuseful
+        $result_description = sprintf($result_description, @$params);        
     }
 
     my $constructor_params =
