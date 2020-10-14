@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+  </head>
+  <body>
+    <form action="/query" method="post">
+      <textarea id="req" style="width: 500px; height: 300px">
+{
+  "command": "echo",
+  "params": { "p1": "p1", "p2": "p2" }
+}
+      </textarea>
+      <input type="submit" onclick="
+        event.preventDefault();
+        var content = document.getElementById(\'req\').value
+        console.log(content)
+        axios.post(\'http://localhost:3000/query\', content)
+          .then(function (response) {
+            console.log(\'--OK--\')
+            console.log(response.data)
+          })
+          .catch(function (error) {
+            console.log(\'--KO--\')
+            console.log(error)
+          })
+      "/>
+    </form>
+  </body>
+</html>
