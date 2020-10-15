@@ -103,14 +103,16 @@ sub testSingleNumber
 
 
 package Rest::App::Mojo;
-# this package is the real Mojolicious app
+# this package is the real Mojo app
 
 use Mojolicious::Lite;
 
 use Logic::ValidatorManager;
 use Persistence::Repository::PhoneNumber;
 use Logic::AppLogic;
-use Mojo::Log;
+use Utils::Log;
+use Utils::Config;
+
 
 # CORS stuff
 app->hook(before_dispatch => sub 
@@ -133,18 +135,14 @@ any ['OPTIONS'] => '/checkSingleNumber'  => { text => 'OPTIONS!' };
 any ['OPTIONS'] => '/testSingleNumber'   => { text => 'OPTIONS!' };
 
 # set-up application logic components: validation layer and persistence layer
-my $validator   = Logic::ValidatorManager->getInstance->getValidator($ENV{PHONE_NUMBER_VALIDATOR} || 'simple');
+my $validator   = Logic::ValidatorManager->getInstance->getValidator(Utils::Config::getValidatorName());
 my $database    = Persistence::Repository::PhoneNumber->new;
 my $appLogic    = Logic::AppLogic->new(db => $database, validator => $validator);
 app->{personal_session} = $appLogic;
 
-# set-up logging: this is only "an exercise app": a simple static (not configurable) logging is enough
-my $log_file_name = '../tmp/log/mojo.log';
-open(my($fh), '>', $log_file_name) or die("cannot open log file $log_file_name"); # creo e pulisco il file
-print $fh 'TEST';
-close($fh);
-my $log = Mojo::Log->new(path => $log_file_name, level => 'debug');
-app->log($log);
+# connect the http server log to the entire application log
+app->log(Utils::Log::getLogger());
+app->log->debug('application is now ready!');
 
 # return the application object for use with "morbo" server and alike
 app; 
