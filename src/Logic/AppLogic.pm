@@ -1,7 +1,10 @@
 package Logic::AppLogic;
 
 use Moose;
+
 use Model::PhoneNumber;
+use Utils::Log;
+
 
 has 'db'        => (isa  => 'Persistence::Repository::PhoneNumber'  , is => 'ro', required => 1);
 has 'validator' => (does => 'Logic::Validator'                      , is => 'rw', required => 1);
@@ -9,6 +12,7 @@ has 'validator' => (does => 'Logic::Validator'                      , is => 'rw'
 
 sub checkSingleNumber
 {   my $self = shift; my($phoneNumber) = @_;
+    Utils::Log::getLogger()->debug("Logic::AppLogic: checkSingleNumber invoked");
 
     my $validator_result = $self->validator->validate($phoneNumber);
     $self->db->insertOrReplaceValidation($validator_result);
@@ -34,6 +38,7 @@ my $process_csv_lines = sub
 
 sub checkNumbers
 {   my $self = shift; my($csvContent) = @_;
+    Utils::Log::getLogger()->debug("Logic::AppLogic: checkNumbers invoked");
 
     my @validator_result_list = ();
 

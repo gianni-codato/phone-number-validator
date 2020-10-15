@@ -3,6 +3,8 @@ package Persistence::InMemoryDB;
 use Moose;
 
 use DBD::SQLite;
+use Utils::Log;
+
 
 # database handle
 has 'dbh' => (isa => 'DBI::db', is => 'rw');
@@ -10,6 +12,7 @@ has 'dbh' => (isa => 'DBI::db', is => 'rw');
 
 sub BUILD
 {   my $self = shift;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB: BUILD invoked");
 
     # options that should work fine, for a exercise like this one
     my $dbh = DBI->connect("dbi:SQLite:dbname=:memory:", undef, undef, 
@@ -25,19 +28,21 @@ sub BUILD
 }
 
 
-sub begin_tran
+sub beginTran
 {   my $self = shift;
     $self->executeQuery('BEGIN EXCLUSIVE TRANSACTION;');
 }
 
-sub commit_tran
+sub commitTran
 {   my $self = shift;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB: BUILD invoked");
     $self->executeQuery('COMMIT TRANSACTION;');
 }
 
 
 sub multiStatementQuery
 {   my $self = shift; my($multiStatementQuery, $params, $flagArrayRow) = @_;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB: multiStatementQuery=$multiStatementQuery");
 
     my @full_result_set = ();
 
@@ -83,6 +88,8 @@ sub multiStatementQuery
 # parameter value
 sub executeQuery
 {   my $self = shift; my($statement, $params, $flagArrayRow) = @_;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB: flagArrayRow=" 
+            . (defined($flagArrayRow) ? $flagArrayRow : "undef") . "; executeQuery=$statement");
 
     my $dbh = $self->dbh;
     
@@ -90,7 +97,9 @@ sub executeQuery
 
     if (defined($params))
     {   my $index = 0;
-        map { $sth->bind_param(++$index, $_) } @$params;
+        map {   $sth->bind_param(++$index, $_);
+                Utils::Log::getLogger()->debug("Persistence::InMemoryDB: executeQuery; param $index = $_");
+        } @$params;
     }
 
     $sth->execute();
@@ -99,6 +108,7 @@ sub executeQuery
     
     if ($sth->{NUM_OF_FIELDS})  # verifico se era una select
     {   my $ret_val =  $sth->fetchall_arrayref($array_or_hash);
+        Utils::Log::debugWithDump("Persistence::InMemoryDB: executeQuery; result set=", $ret_val);
         return $ret_val;
     }
     return undef;

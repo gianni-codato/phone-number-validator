@@ -2,6 +2,7 @@ package Logic::Validator::Standard;
 
 use Moose;
 use Model::ValidatorResult;
+use Utils::Log;
 
 with 'Logic::Validator';
 
@@ -9,26 +10,32 @@ sub validate
 {   my $self = shift; my($phoneNumber) = @_;
 
     my $raw_num = $phoneNumber->rawNum;
+    Utils::Log::getLogger()->debug("Logic::Validator::Standard: num=$raw_num");
     
     my @splitted_num = split('_DELETED_', $raw_num);
     my $num_elements = scalar(@splitted_num);
     if ($num_elements > 2)
-    {   return $self->buildValidatorResult($phoneNumber, 'I1');
+    {   Utils::Log::getLogger()->debug("Logic::Validator::Standard: num_elements > 2");
+        return $self->buildValidatorResult($phoneNumber, 'I1');
     }
     
     my($num, $time, $correction_code);
 
     $num = $splitted_num[0];
     if (!defined($num) || $num eq '')
-    {   return $self->buildValidatorResult($phoneNumber, 'I3');
+    {   Utils::Log::getLogger()->debug("Logic::Validator::Standard: empty num");
+        return $self->buildValidatorResult($phoneNumber, 'I3');
     }
     if ($num !~ m|^(27)?(\d{3})(\d{6})$|)
-    {   return $self->buildValidatorResult($phoneNumber, 'I2');
+    {   Utils::Log::getLogger()->debug("Logic::Validator::Standard: incorrect num");
+        return $self->buildValidatorResult($phoneNumber, 'I2');
     }
-    my $normalized_number = "+(27) $2 $3"; 
+    my $normalized_number = "+(27) $2 $3";
+    Utils::Log::getLogger()->debug("Logic::Validator::Standard: normalized num=$normalized_number");
 
     if ($num_elements == 2)
     {   $time = $splitted_num[1];
+        Utils::Log::getLogger()->debug("Logic::Validator::Standard: time=$time"); 
         if (!defined($time) or $time eq '') # i.e. '27123456789_DELETED_'
         {   $correction_code = 'C1';
         }
@@ -40,12 +47,16 @@ sub validate
             else 
             {   $correction_code = 'C2';
                 $time = localtime($time);
+                Utils::Log::getLogger()->debug("Logic::Validator::Standard: human readable time=$time");
             }
         }
     }
     $correction_code = 'A1' if (!defined($correction_code));
+    Utils::Log::getLogger()->debug("Logic::Validator::Standard: correction_code=$correction_code");
 
-    return $self->buildValidatorResult($phoneNumber, $correction_code, $normalized_number, [$time]);
+    my $vr = $self->buildValidatorResult($phoneNumber, $correction_code, $normalized_number, [$time]);
+    Utils::Log::debugWithDump("Logic::Validator::Standard: validatorResult=", $vr);
+    return $vr
 }
 
 

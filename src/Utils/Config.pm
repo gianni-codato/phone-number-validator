@@ -22,6 +22,11 @@ sub getLogDir
 {   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_DIR', 'tmp/log')
 }
 
+sub getLogLevel
+{   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_LEVEL', 'info')
+}
+
+
 
 sub getValidatorName
 {   return $get_env_entry_with_default->('PHONE_NUMBER_VALIDATOR', 'simple')

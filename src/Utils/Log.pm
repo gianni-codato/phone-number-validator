@@ -7,6 +7,7 @@ package Utils::Log;
 
 use Mojo::Log;
 use Utils::Config;
+use Data::Dumper;
 
 
 my $get_log_file_name_sub = sub
@@ -23,12 +24,21 @@ my $get_log_file_name_sub = sub
 my $logger; # singleton instance
 sub getLogger
 {   
-    return $logger if (defined($logger));
+    if (!defined($logger))
+    {   my $file_name = $get_log_file_name_sub->();
+        unlink $file_name;
+        my $log_level = Utils::Config::getLogLevel();
+        # TODO: check if the supplied level is valid!
+        $logger = Mojo::Log->new(path => $file_name, level => $log_level);
+    }
 
-    my $file_name = $get_log_file_name_sub->();
-    unlink $file_name;
-    my $log = Mojo::Log->new(path => $file_name, level => 'debug');
+    return $logger;
 }
 
+
+sub debugWithDump
+{   my($msg, $obj) = @_;
+    getLogger()->debug($msg, Dumper($obj));
+}
 
 1;

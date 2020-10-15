@@ -2,6 +2,8 @@ package Persistence::Repository::PhoneNumber;
 
 use Moose;
 
+use Utils::Log;
+
 extends 'Persistence::InMemoryDB';
 
 my $create_phone_number = '
@@ -28,6 +30,7 @@ my $insert_validation = '
 ';
 sub insertValidation
 {   my $self = shift; my($validationResult) = @_;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::insertValidation invoked");
 
     my $params = 
     [   $validationResult->phoneNumber->id,
@@ -46,6 +49,7 @@ my $delete_validation = '
 ';
 sub deleteValidation
 {   my $self = shift; my($validationResult) = @_;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::deleteValidation invoked");
 
     my $old_value_result_set = $self->selectValidationById($validationResult);
     my $params = [ $validationResult->phoneNumber->id ];
@@ -61,6 +65,7 @@ my $select_validation_by_id = '
 ';
 sub selectValidationById
 {   my $self = shift; my($validationResult) = @_;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::selectValidationById invoked");
 
     my $params = [ $validationResult->phoneNumber->id ];
     my $select_result_set = $self->executeQuery($select_validation_by_id, $params);
@@ -75,11 +80,12 @@ sub selectValidationById
 
 sub insertOrReplaceValidation
 {   my $self = shift; my($validationResult) = @_;
+    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::insertOrReplaceValidation invoked");
 
-    #$self->begin_tran;
+    $self->beginTran;
     my $old_value = $self->deleteValidation($validationResult);
     $self->insertValidation($validationResult);
-    #$self->commit_tran;
+    $self->commitTran;
 
     return $old_value;
 }

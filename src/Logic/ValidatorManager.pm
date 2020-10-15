@@ -4,6 +4,7 @@ use Moose;
 
 use Logic::Validator::Simple;
 use Logic::Validator::Standard;
+use Utils::Log;
 
 
 # class properties
@@ -19,14 +20,16 @@ sub getInstance
     return $singleton;
 }
 
+
+# private validator cache
 my $validatorsList = 
 {   'simple'    => Logic::Validator::Simple->new(name => 'simple'),
     'standard'  => Logic::Validator::Standard->new(name => 'standard'),
 };
 
-
 sub getValidator
 {   my $self = shift; my($name) = @_;
+    Utils::Log::getLogger()->debug("Logic::ValidatorManager: getValidator($name)");
     return $validatorsList->{$name};
 }
 

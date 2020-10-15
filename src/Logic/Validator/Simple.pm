@@ -1,7 +1,9 @@
 package Logic::Validator::Simple;
 
 use Moose;
+
 use Model::ValidatorResult;
+use Utils::Log;
 
 with 'Logic::Validator';
 
@@ -16,14 +18,18 @@ sub validate
     {   $normalizedNumber = "+(27) $2 $3"; 
     }
 
-    return Model::ValidatorResult->new
+    my $vr = Model::ValidatorResult->new
     (   phoneNumber => $phoneNumber,
         validator   => $self,
         resultType  => ($isValid ? 'ACCEPTABLE' : 'INCORRECT'),
         resultCode  => ($isValid ? 'OK' : 'KO'),
         resultDescription => 'N/A',
         normalizedNumber  => $normalizedNumber,
-    )
+    );
+
+    Utils::Log::debugWithDump("Logic::Validator::Simple: ", $vr);
+
+    return $vr;
 }
 
 1;
