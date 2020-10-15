@@ -3,6 +3,9 @@ package Rest::App;
 
 use Moose;
 
+use Utils::Log;
+
+
 has 'unwrapMojoApp' => (isa => 'Mojolicious::Lite', is => 'ro', required => 1);
 
 my $singleton = Rest::App->new(unwrapMojoApp => Rest::App::Mojo->new);
@@ -12,9 +15,10 @@ sub getInstance
 
 sub setValidator
 {   my $self = shift; my($validatorName) = @_;
+    Utils::Log::getLogger()->info("Rest::App::setValidator: changing application validator to $validatorName");
 
     my $validator = Logic::ValidatorManager->getInstance->getValidator($validatorName || 'simple');
-    $singleton->unwrapMojoApp->{personal_session}->validator($validator);
+    $singleton->unwrapMojoApp->{_global_application_context}->validator($validator);
 }
 
 
@@ -25,13 +29,13 @@ package Rest::App::Mojo::Logic;
 # and build the response with that result
 
 use Model::PhoneNumber;
+use Utils::Log;
 
-use Data::Dumper;
 
 sub home
 {   my $c = shift;
+    Utils::Log::getLogger()->info("Rest::App::Mojo::Logic::home invoked");
     $c->render(text => 'Welcome Home!');
-    $c->app->log->info('home called');
 }
 
 
@@ -60,6 +64,7 @@ my $build_response_object_from_validator = sub
 
 sub checkNumbers
 {   my $c = shift;
+    Utils::Log::getLogger()->info("Rest::App::Mojo::Logic::checkNumbers invoked");
 
     # extract the file uploaded
     my $csvPhonesFileContent = $c->param('phoneNumbersList');
@@ -68,7 +73,7 @@ sub checkNumbers
     }
 
     # invoke the right business logic and catch the result
-    my $appLogic = $c->app->{personal_session};
+    my $appLogic = $c->app->{_global_application_context};
     my $validatorResultList = $appLogic->checkNumbers($csvPhonesFileContent);
     
     my $response_object = [];
@@ -81,13 +86,14 @@ sub checkNumbers
 
 sub checkSingleNumber
 {   my $c = shift;
+    Utils::Log::getLogger()->info("Rest::App::Mojo::Logic::checkSingleNumber invoked");
     
     # extract parameters from request and convert them into a phone number
     my $phoneNumber = $build_phone_number->($c->param('id'), $c->param('number'));
-    $c->app->log->info('checkSingleNumber called: ', Dumper($phoneNumber));
+    Utils::Log::debugWithDump('Rest::App::Mojo::Logic::checkSingleNumber: phoneNumber=', $phoneNumber);
 
     # invoke the right business logic and catch the result
-    my $appLogic = $c->app->{personal_session};
+    my $appLogic = $c->app->{_global_application_context};
     my $validatorResult = $appLogic->checkSingleNumber($phoneNumber);
     
     # convert the result in json
@@ -97,6 +103,7 @@ sub checkSingleNumber
 
 sub testSingleNumber
 {   my $c = shift;
+    Utils::Log::getLogger()->info("Rest::App::Mojo::Logic::testSingleNumber invoked");
     $c->render(template => 'testSingleNumber');
 };
 
@@ -138,11 +145,11 @@ any ['OPTIONS'] => '/testSingleNumber'   => { text => 'OPTIONS!' };
 my $validator   = Logic::ValidatorManager->getInstance->getValidator(Utils::Config::getValidatorName());
 my $database    = Persistence::Repository::PhoneNumber->new;
 my $appLogic    = Logic::AppLogic->new(db => $database, validator => $validator);
-app->{personal_session} = $appLogic;
+app->{_global_application_context} = $appLogic;
 
 # connect the http server log to the entire application log
 app->log(Utils::Log::getLogger());
-app->log->debug('application is now ready!');
+app->log->info('Rest::App::Mojo: application is now ready!');
 
 # return the application object for use with "morbo" server and alike
 app; 

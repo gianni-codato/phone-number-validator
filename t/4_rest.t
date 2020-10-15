@@ -35,7 +35,7 @@ $t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 274783429
                 normalizedNumber    => '+(27) 478 342944',
             }
         });
-# diag(Dumper($t->tx->res));
+# diag(Dumper($t->tx->res->body));
 
 
 my $csvContent = <<'EOF';
