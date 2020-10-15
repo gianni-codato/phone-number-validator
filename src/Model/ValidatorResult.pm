@@ -1,4 +1,4 @@
-package Logic::ValidatorResult;
+package Model::ValidatorResult;
 
 use Moose;
 

@@ -1,7 +1,7 @@
 package Logic::Validator::Standard;
 
 use Moose;
-use Logic::ValidatorResult;
+use Model::ValidatorResult;
 
 with 'Logic::Validator';
 
@@ -84,7 +84,7 @@ sub buildValidatorResult
     };
     $constructor_params->{normalizedNumber} = $normalized_number if (defined($normalized_number));
 
-    return Logic::ValidatorResult->new($constructor_params);
+    return Model::ValidatorResult->new($constructor_params);
 }
 
 1;

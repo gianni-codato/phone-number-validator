@@ -1,7 +1,7 @@
 package Logic::Validator::Simple;
 
 use Moose;
-use Logic::ValidatorResult;
+use Model::ValidatorResult;
 
 with 'Logic::Validator';
 
@@ -16,7 +16,7 @@ sub validate
     {   $normalizedNumber = "+(27) $2 $3"; 
     }
 
-    return Logic::ValidatorResult->new
+    return Model::ValidatorResult->new
     (   phoneNumber => $phoneNumber,
         validator   => $self,
         resultType  => ($isValid ? 'ACCEPTABLE' : 'INCORRECT'),
