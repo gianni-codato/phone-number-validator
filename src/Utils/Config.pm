@@ -29,7 +29,7 @@ sub getLogLevel
 
 
 sub getValidatorName
-{   return $get_env_entry_with_default->('PHONE_NUMBER_VALIDATOR', 'simple')
+{   return $get_env_entry_with_default->('PHONE_NUMBER_VALIDATOR', 'standard')
 }
 
 

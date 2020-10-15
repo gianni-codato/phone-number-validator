@@ -4,6 +4,7 @@ use Moose;
 
 use Logic::Validator::Simple;
 use Logic::Validator::Standard;
+use Logic::Validator::StandardI18n;
 use Utils::Log;
 
 
@@ -23,8 +24,9 @@ sub getInstance
 
 # private validator cache
 my $validatorsList = 
-{   'simple'    => Logic::Validator::Simple->new(name => 'simple'),
-    'standard'  => Logic::Validator::Standard->new(name => 'standard'),
+{   'simple'        => Logic::Validator::Simple->new(name => 'simple'),
+    'standard'      => Logic::Validator::Standard->new(name => 'standard'),
+    'standardI18n'  => Logic::Validator::StandardI18n->new(name => 'standardI18n'),
 };
 
 sub getValidator

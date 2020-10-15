@@ -11,7 +11,9 @@ use JSON;
 use Rest::App;
 
 
+
 my $restApp = Rest::App->getInstance();
+$restApp->setValidator('standard');
 is(blessed($restApp), 'Rest::App', 'testing restful application creation');
 
 my $mojoApp = $restApp->unwrapMojoApp;
@@ -24,10 +26,10 @@ $t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 274783429
    ->status_is(200, 'check response status')
    ->json_is(
         {   validation => 
-            {   algoritm            => 'simple',
+            {   algoritm            => 'standard',
                 result              => 'ACCEPTABLE',
-                statusCode          => 'OK',
-                statusDescription   => 'N/A',
+                statusCode          => 'A1',
+                statusDescription   => 'The number is correct',
             },
             phoneNumber =>
             {   id                  => 103343262,
@@ -47,10 +49,10 @@ $t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
    ->status_is(200, 'check response status')
    ->json_is(
         [   {   validation => 
-                {   algoritm            => 'simple',
+                {   algoritm            => 'standard',
                     result              => 'ACCEPTABLE',
-                    statusCode          => 'OK',
-                    statusDescription   => 'N/A',
+                    statusCode          => 'A1',
+                    statusDescription   => 'The number is correct',
                 },
                 phoneNumber =>
                 {   id                  => 1033432,
@@ -59,10 +61,10 @@ $t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
                 }
             },
             {   validation => 
-                {   algoritm            => 'simple',
+                {   algoritm            => 'standard',
                     result              => 'ACCEPTABLE',
-                    statusCode          => 'OK',
-                    statusDescription   => 'N/A',
+                    statusCode          => 'A1',
+                    statusDescription   => 'The number is correct',
                 },
                 phoneNumber =>
                 {   id                  => 10334326,
@@ -75,19 +77,20 @@ $t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
 
 
 my $file_name = 't/Pre-selezione. South_African_Mobile_Numbers.csv';
-open(my $fh, '<:encoding(UTF-8)', $file_name);
-binmode($fh);
-local $/;
-my $text = <$fh>;
-# diag("contenuto del file: ", $text);
-my $form = { phoneNumbersFile => { filename => $file_name, content => $text } };
+my $file_content;
+{   local $/ = undef;
+    open(my $fh, '<:encoding(UTF-8)', $file_name);
+    binmode($fh);
+    $file_content = <$fh>;
+    # diag("contenuto del file: ", $file_content);
+}
+my $form = { phoneNumbersFile => { filename => $file_name, content => $file_content } };
 $t->post_ok('/checkNumbers', form => $form)
     ->status_is(200, 'check response status');
 # my $body = $t->tx->res->body;
 # diag(Dumper($body));
 
 
-$restApp->setValidator('standard');
 $t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 27478342944 })
    ->status_is(200, 'check response status');
 # diag(Dumper($t->tx->res->body));

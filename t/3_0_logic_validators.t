@@ -61,6 +61,7 @@ is(blessed($validatorResult), 'Model::ValidatorResult');
 is($validatorResult->resultType, 'ACCEPTABLE', 'Validating an incorrect number');
 
 
+
 $validator = $manager->getValidator('standard');
 ok(defined($validator), 'standard validator creation from validators manager (defined)');
 is(blessed($validator), 'Logic::Validator::Standard', 'standard validator creation from validators manager');
@@ -91,6 +92,16 @@ is(blessed($validatorResult), 'Model::ValidatorResult');
 is($validatorResult->resultType, 'CORRECTED', 'Standard validator - corrected - type');
 is($validatorResult->resultCode, 'C2', 'Standard validator - corrected - code');
 # diag(Dumper($validatorResult));
+
+
+
+$validator = $manager->getValidator('standardI18n');
+$pn = Model::PhoneNumber->new(id => 103343262, rawNum => '27478342944');
+$validatorResult = $validator->validate($pn, 'it-IT');
+# diag(Dumper($validatorResult));
+is(blessed($validatorResult), 'Model::ValidatorResult');
+is($validatorResult->resultType, 'ACCEPTABLE', 'Validating an incorrect number');
+is($validatorResult->resultDescription, 'Il numero di telefono è corretto', 'Validating i18n description');
 
 
 done_testing();

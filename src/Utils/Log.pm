@@ -4,6 +4,9 @@ package Utils::Log;
 # for this pourpose and let a fine-grained configuration by sys-guys/dev-ops;
 # in this project I wrote this class only to avoid external dependencies
 
+use strict;
+use warnings;
+
 
 use Mojo::Log;
 use Utils::Config;
@@ -30,6 +33,7 @@ sub getLogger
         my $log_level = Utils::Config::getLogLevel();
         # TODO: check if the supplied level is valid!
         $logger = Mojo::Log->new(path => $file_name, level => $log_level);
+        $logger->debug('logger started!');
     }
 
     return $logger;

@@ -22,7 +22,7 @@ is(Utils::Config::getLogLevel(), 'info', 'log level - default value');
 $ENV{PHONE_NUMBER_VALIDATOR} = 'prova_validator';
 is(Utils::Config::getValidatorName(), 'prova_validator', 'validator name - specified value');
 delete($ENV{PHONE_NUMBER_VALIDATOR});
-is(Utils::Config::getValidatorName(), 'simple', 'validator name - default value');
+is(Utils::Config::getValidatorName(), 'standard', 'validator name - default value');
 
 
 

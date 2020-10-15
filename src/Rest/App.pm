@@ -62,6 +62,12 @@ my $build_response_object_from_validator = sub
 };
 
 
+
+# TODO: user management... work in progress!
+my $get_hard_coded_user = Persistence::DataSourceManager::getDataSource('users')->selectUser('codato');
+
+
+
 sub checkNumbers
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::App::Mojo::Logic::checkNumbers invoked");
@@ -74,7 +80,7 @@ sub checkNumbers
 
     # invoke the right business logic and catch the result
     my $appLogic = $c->app->{_global_application_context};
-    my $validatorResultList = $appLogic->checkNumbers($csvPhonesFileContent);
+    my $validatorResultList = $appLogic->checkNumbers($csvPhonesFileContent, $get_hard_coded_user);
     
     my $response_object = [];
     push(@$response_object, $build_response_object_from_validator->($_)) for @$validatorResultList;
@@ -94,7 +100,7 @@ sub checkSingleNumber
 
     # invoke the right business logic and catch the result
     my $appLogic = $c->app->{_global_application_context};
-    my $validatorResult = $appLogic->checkSingleNumber($phoneNumber);
+    my $validatorResult = $appLogic->checkSingleNumber($phoneNumber, $get_hard_coded_user);
     
     # convert the result in json
     $c->render(json => $build_response_object_from_validator->($validatorResult));

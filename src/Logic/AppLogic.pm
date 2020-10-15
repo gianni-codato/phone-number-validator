@@ -4,6 +4,7 @@ use Moose;
 
 use Model::PhoneNumber;
 use Utils::Log;
+use Persistence::DataSourceManager;
 
 
 has 'db'        => (isa  => 'Persistence::Repository::PhoneNumber'  , is => 'ro', required => 1);
@@ -11,10 +12,10 @@ has 'validator' => (does => 'Logic::Validator'                      , is => 'rw'
 
 
 sub checkSingleNumber
-{   my $self = shift; my($phoneNumber) = @_;
+{   my $self = shift; my($phoneNumber, $user) = @_;
     Utils::Log::getLogger()->debug("Logic::AppLogic: checkSingleNumber invoked");
 
-    my $validator_result = $self->validator->validate($phoneNumber);
+    my $validator_result = $self->validator->validate($phoneNumber, $user);
     $self->db->insertOrReplaceValidation($validator_result);
 
     return $validator_result;
@@ -37,7 +38,7 @@ my $process_csv_lines = sub
 
 
 sub checkNumbers
-{   my $self = shift; my($csvContent) = @_;
+{   my $self = shift; my($csvContent, $user) = @_;
     Utils::Log::getLogger()->debug("Logic::AppLogic: checkNumbers invoked");
 
     my @validator_result_list = ();
@@ -45,7 +46,7 @@ sub checkNumbers
     $process_csv_lines->($csvContent, sub
     {   my($id, $raw_number) = @_;
         my $phone_number = Model::PhoneNumber->new(id => $id, rawNum => $raw_number);
-        my $line_validator_result = $self->checkSingleNumber($phone_number);
+        my $line_validator_result = $self->checkSingleNumber($phone_number, $user);
         push(@validator_result_list, $line_validator_result);
     });
 
