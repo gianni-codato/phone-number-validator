@@ -15,9 +15,9 @@ delete($ENV{PHONE_NUMBER_LOG_DIR});
 is(Utils::Config::getLogDir(), 'tmp/log', 'log dir - default value');
 
 $ENV{PHONE_NUMBER_LOG_LEVEL} = 'debug';
-is(Utils::Config::getLogLvel(), 'debug', 'log level - specified value');
+is(Utils::Config::getLogLevel(), 'debug', 'log level - specified value');
 delete($ENV{PHONE_NUMBER_LOG_LEVEL});
-is(Utils::Config::getLogLvel(), 'info', 'log level - default value');
+is(Utils::Config::getLogLevel(), 'info', 'log level - default value');
 
 $ENV{PHONE_NUMBER_VALIDATOR} = 'prova_validator';
 is(Utils::Config::getValidatorName(), 'prova_validator', 'validator name - specified value');
