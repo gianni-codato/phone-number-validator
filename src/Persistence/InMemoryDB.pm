@@ -49,7 +49,7 @@ sub multiStatementQuery
     my @statement_list = split(m|;|, $multiStatementQuery);
     foreach my $statement(@statement_list)
     {   my $result_set = $self->executeQuery($statement, $params, $flagArrayRow);
-        push(@full_result_set, @$result_set);
+        push(@full_result_set, @$result_set) if (ref($result_set) eq 'ARRAY');
     }
 
     return \@full_result_set;

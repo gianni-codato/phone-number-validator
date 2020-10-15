@@ -5,6 +5,7 @@ use Test::More;
 
 use Persistence::InMemoryDB;
 use Persistence::Repository::PhoneNumber;
+use Persistence::Repository::I18n;
 
 use Moose;
 
@@ -43,7 +44,14 @@ is($firstRow->[0] , -1, 'result-set row field value - array');
 
 
 $db = Persistence::Repository::PhoneNumber->new;
-ok(blessed($db) eq 'Persistence::Repository::PhoneNumber');
+is(blessed($db), 'Persistence::Repository::PhoneNumber', 'PhoneNumber db initialization');
+
+
+$db = Persistence::Repository::I18n->new;
+is(blessed($db), 'Persistence::Repository::I18n', 'I18n db initialization');
+
+my $msg = $db->selectMessage('Logic::Validator::Standard', 'A1', 'it-it');
+is($msg, 'Il numero di telefono è corretto', 'I18n massage select');
 
 
 done_testing();

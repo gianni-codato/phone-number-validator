@@ -30,7 +30,7 @@ my $insert_validation = '
 ';
 sub insertValidation
 {   my $self = shift; my($validationResult) = @_;
-    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::insertValidation invoked");
+    Utils::Log::getLogger()->debug("Persistence::Repository::PhoneNumber::insertValidation invoked");
 
     my $params = 
     [   $validationResult->phoneNumber->id,
@@ -49,7 +49,7 @@ my $delete_validation = '
 ';
 sub deleteValidation
 {   my $self = shift; my($validationResult) = @_;
-    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::deleteValidation invoked");
+    Utils::Log::getLogger()->debug("Persistence::Repository::PhoneNumber::deleteValidation invoked");
 
     my $old_value_result_set = $self->selectValidationById($validationResult);
     my $params = [ $validationResult->phoneNumber->id ];
@@ -65,7 +65,7 @@ my $select_validation_by_id = '
 ';
 sub selectValidationById
 {   my $self = shift; my($validationResult) = @_;
-    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::selectValidationById invoked");
+    Utils::Log::getLogger()->debug("Persistence::Repository::PhoneNumber::selectValidationById invoked");
 
     my $params = [ $validationResult->phoneNumber->id ];
     my $select_result_set = $self->executeQuery($select_validation_by_id, $params);
@@ -80,7 +80,7 @@ sub selectValidationById
 
 sub insertOrReplaceValidation
 {   my $self = shift; my($validationResult) = @_;
-    Utils::Log::getLogger()->debug("Persistence::InMemoryDB::insertOrReplaceValidation invoked");
+    Utils::Log::getLogger()->debug("Persistence::Repository::PhoneNumber::insertOrReplaceValidation invoked");
 
     $self->beginTran;
     my $old_value = $self->deleteValidation($validationResult);

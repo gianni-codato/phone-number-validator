@@ -69,7 +69,6 @@ my $code_descriptions =
     C2 => 'The phone number is no longer active (deletion date/time: %s): the information about that deactivation have being removed from the number',
     C3 => 'The phone number is no longer active (deleted): the information about that deactivation were corrupted and removed from the number',
     A1 => 'The number is correct',
-
 };
 my $type_mapping =
 {   I => 'INCORRECT',
