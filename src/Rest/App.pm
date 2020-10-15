@@ -1,5 +1,5 @@
 package Rest::App;
-# the purpose of this package is to wrap the Mojo application inside Moose class instance
+# the purpose of this package is to wrap the Mojo application inside a Moose class instance
 
 use Moose;
 
@@ -15,21 +15,23 @@ sub setValidator
 
     my $validator = Logic::ValidatorManager->getInstance->getValidator($validatorName || 'simple');
     $singleton->unwrapMojoApp->{personal_session}->validator($validator);
-    
 }
 
 
 package Rest::App::Mojo::Logic;
 # the purpose of this package is to expose the subs that implement the logic behind the rest
-# interface; every sub play the role of an adapter che extract the parameters from the request,
-# invoke che right business logic functionality providing the params, capture the result and
-# build the response with the result
+# interface; every sub play the role of an adapter that extract the parameters from the request,
+# invoke che right business logic functionality providing those parameters, capture the result
+# and build the response with that result
 
 use Model::PhoneNumber;
+
+use Data::Dumper;
 
 sub home
 {   my $c = shift;
     $c->render(text => 'Welcome Home!');
+    $c->app->log->info('home called');
 }
 
 
@@ -82,6 +84,7 @@ sub checkSingleNumber
     
     # extract parameters from request and convert them into a phone number
     my $phoneNumber = $build_phone_number->($c->param('id'), $c->param('number'));
+    $c->app->log->info('checkSingleNumber called: ', Dumper($phoneNumber));
 
     # invoke the right business logic and catch the result
     my $appLogic = $c->app->{personal_session};
@@ -94,8 +97,9 @@ sub checkSingleNumber
 
 sub testSingleNumber
 {   my $c = shift;
-    $c->render(template => 'diProva');
+    $c->render(template => 'testSingleNumber');
 };
+
 
 
 package Rest::App::Mojo;
@@ -106,17 +110,41 @@ use Mojolicious::Lite;
 use Logic::ValidatorManager;
 use Persistence::Repository::PhoneNumber;
 use Logic::AppLogic;
+use Mojo::Log;
 
-get     '/'                     => \&Rest::App::Mojo::Logic::home;
-post    '/checkNumbers'         => \&Rest::App::Mojo::Logic::checkNumbers;
-post    '/checkSingleNumber'    => \&Rest::App::Mojo::Logic::checkSingleNumber;
-get     '/testSingleNumber'     => \&Rest::App::Mojo::Logic::testSingleNumber;
+# CORS stuff
+app->hook(before_dispatch => sub 
+{   my $c = shift;
+    my $headers = $c->res->headers;
+    $headers->header('Access-Control-Allow-Origin'  => '*');
+    $headers->header('Access-Control-Allow-Methods' => 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    $headers->header('Access-Control-Max-Age'       => 3600);
+    $headers->header('Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With');
+});
 
+# set-up routes
+any ['GET'  ] => '/'                     => \&Rest::App::Mojo::Logic::home;
+any ['POST' ] => '/checkNumbers'         => \&Rest::App::Mojo::Logic::checkNumbers;
+any ['POST' ] => '/checkSingleNumber'    => \&Rest::App::Mojo::Logic::checkSingleNumber;
+any ['GET'  ] => '/testSingleNumber'     => \&Rest::App::Mojo::Logic::testSingleNumber;
+any ['OPTIONS'] => '/'                   => { text => 'OPTIONS!' };
+any ['OPTIONS'] => '/checkNumbers'       => { text => 'OPTIONS!' };
+any ['OPTIONS'] => '/checkSingleNumber'  => { text => 'OPTIONS!' };
+any ['OPTIONS'] => '/testSingleNumber'   => { text => 'OPTIONS!' };
+
+# set-up application logic components: validation layer and persistence layer
 my $validator   = Logic::ValidatorManager->getInstance->getValidator($ENV{PHONE_NUMBER_VALIDATOR} || 'simple');
 my $database    = Persistence::Repository::PhoneNumber->new;
 my $appLogic    = Logic::AppLogic->new(db => $database, validator => $validator);
 app->{personal_session} = $appLogic;
 
+# set-up logging: this is only "an exercise app": a simple static (not configurable) logging is enough
+my $log_file_name = '../tmp/log/mojo.log';
+open(my($fh), '>', $log_file_name) or die("cannot open log file $log_file_name"); # creo e pulisco il file
+print $fh 'TEST';
+close($fh);
+my $log = Mojo::Log->new(path => $log_file_name, level => 'debug');
+app->log($log);
 
 # return the application object for use with "morbo" server and alike
 app; 

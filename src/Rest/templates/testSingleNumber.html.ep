@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+    <script>
+      function execPost(event) {
+        event.preventDefault();
+        var id      = document.getElementById('input-id').value
+        var number  = document.getElementById('input-number').value
+        var content = 'id=' + id + '&number=' + number
+        console.log('content request'); console.log(content)
+        axios.post('http://localhost:3000/checkSingleNumber', content)
+          .then(function (response) {
+            var jsonResponseData = response.data
+            console.log(jsonResponseData.phoneNumber)
+
+            document.getElementById('output-number').innerHTML = jsonResponseData.phoneNumber.normalizedNumber;
+            document.getElementById('output-result').innerHTML = jsonResponseData.validation.result
+            document.getElementById('output-description').innerHTML = jsonResponseData.validation.statusDescription
+          })
+          .catch(function (error) {
+            console.log('response KO'); console.log(error)
+          })
+      }
+    </script>
+  </head>
+  <body>
+    <form action="/checkSingleNumber" method="post">
+      <input type="text" id="input-id" name="id" style="width: 500px;">
+      <input type="text" id="input-number" name="number" style="width: 500px;">
+      <input type="submit" onclick="execPost(event)"/>
+      <div id='output-number'></div>
+      <div id='output-result'></div>
+      <div id='output-description'></div>
+    </form>
+  </body>
+</html>

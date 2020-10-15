@@ -90,6 +90,6 @@ $t->post_ok('/checkNumbers', form => $form)
 $restApp->setValidator('standard');
 $t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 27478342944 })
    ->status_is(200, 'check response status');
-diag(Dumper($t->tx->res->body));
+# diag(Dumper($t->tx->res->body));
 
 done_testing();
