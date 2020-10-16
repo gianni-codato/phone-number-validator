@@ -9,6 +9,11 @@ use Moose;
 use Logic::ValidatorManager;
 use Logic::AppLogic;
 use Persistence::DataSourceManager;
+use File::Basename qw( basename );
+use Utils::Config;
+
+Utils::Config::setDevelopMode();
+Utils::Log::getLogger()->info('Executing tests: ', basename($0));
 
 
 my $validator   = Logic::ValidatorManager->getInstance->getValidator('simple');

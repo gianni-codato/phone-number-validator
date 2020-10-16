@@ -10,7 +10,11 @@ use Model::PhoneNumber;
 use Logic::ValidatorManager;
 use Logic::Validator::Simple;
 use Logic::AppLogic;
-use Persistence::Repository::PhoneNumber;
+use File::Basename qw( basename );
+use Utils::Config;
+
+Utils::Config::setDevelopMode();
+Utils::Log::getLogger()->info('Executing tests: ', basename($0));
 
 
 # testing a simple validator: 1a) manual instantiation

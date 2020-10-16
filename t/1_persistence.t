@@ -7,10 +7,15 @@ use Test::More;
 use Digest::MD5 qw(md5_hex);
 use Moose;
 use Persistence::DataSourceManager;
-use Persistence::InMemoryDB;
+use Persistence::GenericDataSource;
 use Persistence::Repository::PhoneNumber;
 use Persistence::Repository::I18n;
 use Persistence::Repository::Users;
+use File::Basename qw( basename );
+use Utils::Config;
+
+Utils::Config::setDevelopMode();
+Utils::Log::getLogger()->info('Executing tests: ', basename($0));
 
 
 
@@ -27,8 +32,8 @@ is(blessed($db), 'Persistence::Repository::Users', 'datasource manager - users')
 
 
 # tests for the base super-class of all data-source
-$db = Persistence::InMemoryDB->new;
-ok(blessed($db) eq 'Persistence::InMemoryDB');
+$db = Persistence::GenericDataSource->new(name => ':memory:');
+ok(blessed($db) eq 'Persistence::GenericDataSource');
 
 
 my $resultSet = $db->executeQuery("CREATE TABLE test (test int)");
@@ -59,13 +64,13 @@ is($firstRow->[0] , -1, 'result-set row field value - array');
 
 
 # tests for the PhoneNumber data-source
-$db = Persistence::Repository::PhoneNumber->new;
+$db = Persistence::Repository::PhoneNumber->new(name => ':memory:');
 is(blessed($db), 'Persistence::Repository::PhoneNumber', 'PhoneNumber db initialization');
 
 
 
 # tests for the I18n data-source
-$db = Persistence::Repository::I18n->new;
+$db = Persistence::Repository::I18n->new(name => ':memory:');
 is(blessed($db), 'Persistence::Repository::I18n', 'I18n db initialization');
 
 my $msg = $db->selectMessage('Logic::Validator::StandardI18n', 'A1', 'it-IT');
@@ -74,7 +79,7 @@ is($msg, 'Il numero di telefono è corretto', 'I18n massage select');
 
 
 # tests for the I18n data-source
-$db = Persistence::Repository::Users->new;
+$db = Persistence::Repository::Users->new(name => ':memory:');
 is(blessed($db), 'Persistence::Repository::Users', 'User db initialization');
 my $user = $db->selectUser('codato');
 is(blessed($user), 'Model::User', 'user select');

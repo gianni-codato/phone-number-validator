@@ -9,14 +9,17 @@ use Data::Dumper;
 use JSON;
 
 use Rest::App;
+use Utils::Log;
+use File::Basename qw( basename );
+use Utils::Config;
+
+Utils::Config::setDevelopMode();
+Utils::Log::getLogger()->info('Executing tests: ',  basename($0));
 
 
 
-my $restApp = Rest::App->getInstance();
-$restApp->setValidator('standard');
-is(blessed($restApp), 'Rest::App', 'testing restful application creation');
-
-my $mojoApp = $restApp->unwrapMojoApp;
+my $mojoApp = Rest::App::getInstance();
+Rest::App::setValidator('standard');
 is(blessed($mojoApp), 'Mojolicious::Lite', 'testing mojo application retrieve');
 
 my $t = Test::Mojo->new($mojoApp);
@@ -73,7 +76,7 @@ $t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
                 }
             },
         ]);
-# diag(Dumper($t->tx->res));
+# diag(Dumper($t->tx->res->body));
 
 
 my $file_name = 't/Pre-selezione. South_African_Mobile_Numbers.csv';

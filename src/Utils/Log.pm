@@ -11,14 +11,14 @@ use warnings;
 use Mojo::Log;
 use Utils::Config;
 use Data::Dumper;
+use File::Path qw(make_path);
 
 
 my $get_log_file_name_sub = sub
 {   
     my $dir_name = Utils::Config::getLogDir();
     if (!(-d $dir_name))
-    {   # TODO: too brutal! maybe it's better to create the subdir...
-        die($dir_name, " directory doesn't exists!")
+    {   make_path($dir_name);
     }
     return $dir_name . '/application.log';
 };
@@ -28,12 +28,17 @@ my $logger; # singleton instance
 sub getLogger
 {   
     if (!defined($logger))
-    {   my $file_name = $get_log_file_name_sub->();
-        unlink $file_name;
-        my $log_level = Utils::Config::getLogLevel();
-        # TODO: check if the supplied level is valid!
+    {   
+        my $file_name = $get_log_file_name_sub->();
+        my $log_level = Utils::Config::getLogLevel(); # TODO: check if the supplied level is valid!
+        my $mode = Utils::Config::getMode();
+
+        if ($mode ne 'develop')
+        {   # clean the log every type the application start, but not during development
+            unlink $file_name;
+        }
         $logger = Mojo::Log->new(path => $file_name, level => $log_level);
-        $logger->debug('logger started!');
+        $logger->debug('Utils::Log: logger created');
     }
 
     return $logger;

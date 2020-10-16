@@ -7,16 +7,18 @@ use Utils::Log;
 use Persistence::DataSourceManager;
 
 
-has 'db'        => (isa  => 'Persistence::Repository::PhoneNumber'  , is => 'ro', required => 1);
 has 'validator' => (does => 'Logic::Validator'                      , is => 'rw', required => 1);
 
 
+my $data_source;
 sub checkSingleNumber
 {   my $self = shift; my($phoneNumber, $user) = @_;
     Utils::Log::getLogger()->debug("Logic::AppLogic: checkSingleNumber invoked");
 
     my $validator_result = $self->validator->validate($phoneNumber, $user);
-    $self->db->insertOrReplaceValidation($validator_result);
+
+    $data_source = Persistence::DataSourceManager::getDataSource('phoneNumbers') if (!defined($data_source));
+    $data_source->insertOrReplaceValidation($validator_result);
 
     return $validator_result;
 }

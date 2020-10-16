@@ -18,18 +18,32 @@ my $get_env_entry_with_default = sub
 };
 
 
-sub getLogDir
-{   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_DIR', 'tmp/log')
+
+my $mode; # develop/prod
+sub getMode 
+{   return defined($mode) ? $mode : 'prod';
+}
+sub setDevelopMode
+{   $mode = 'develop';
 }
 
+
+
+sub getLogDir
+{   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_DIR', 'work/log')
+}
 sub getLogLevel
 {   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_LEVEL', 'info')
 }
 
 
-
 sub getValidatorName
 {   return $get_env_entry_with_default->('PHONE_NUMBER_VALIDATOR', 'standard')
+}
+
+
+sub getDataSourceDir
+{   return $get_env_entry_with_default->('PHONE_NUMBER_DATASOURCE', 'work/data')
 }
 
 

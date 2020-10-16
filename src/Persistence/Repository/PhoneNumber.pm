@@ -4,21 +4,23 @@ use Moose;
 
 use Utils::Log;
 
-extends 'Persistence::InMemoryDB';
+extends 'Persistence::GenericDataSource';
 
-my $create_phone_number = '
-    CREATE TABLE phone_number 
-    (   id                      int         primary key
-    ,   raw_number              varchar(80) not null
-    ,   normalized_number       char(14)    null
-    ,   validation_code         char(5)     not null
-    ,   validation_description  varchar(80) not null
-    );
-';
-sub BUILD
+sub initDb
 {   my $self = shift;
-    $self->executeQuery($create_phone_number);
+
+    my $init_db = '
+        CREATE TABLE phone_number 
+        (   id                      int         primary key
+        ,   raw_number              varchar(80) not null
+        ,   normalized_number       char(14)    null
+        ,   validation_code         char(5)     not null
+        ,   validation_description  varchar(80) not null
+        );
+    ';
+    $self->executeQuery($init_db);
 }
+sub getMainTableName { return 'phone_number'; }
 
 
 

@@ -5,14 +5,18 @@ use Test::More;
 
 use Moose;
 use Utils::Log;
+use File::Basename qw( basename );
 use Utils::Config;
+
+Utils::Config::setDevelopMode();
+Utils::Log::getLogger()->info('Executing tests: ', basename($0));
 
 
 # test for config module
 $ENV{PHONE_NUMBER_LOG_DIR} = 'prova_dir';
 is(Utils::Config::getLogDir(), 'prova_dir', 'log dir - specified value');
 delete($ENV{PHONE_NUMBER_LOG_DIR});
-is(Utils::Config::getLogDir(), 'tmp/log', 'log dir - default value');
+is(Utils::Config::getLogDir(), 'work/log', 'log dir - default value');
 
 $ENV{PHONE_NUMBER_LOG_LEVEL} = 'debug';
 is(Utils::Config::getLogLevel(), 'debug', 'log level - specified value');
