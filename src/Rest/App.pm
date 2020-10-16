@@ -3,6 +3,8 @@ package Rest::App;
 
 use Moose;
 
+BEGIN { push(@INC, '.', 'src'); };
+
 use Utils::Log;
 
 
@@ -157,5 +159,7 @@ app->{_global_application_context} = $appLogic;
 app->log(Utils::Log::getLogger());
 app->log->info('Rest::App::Mojo: application is now ready!');
 
-# return the application object for use with "morbo" server and alike
+app->config(morbo => { pid_file => 'tmp/server.pid' });
+
+# return the application object for use with "morbo/hypnotoad" server and alike
 app; 

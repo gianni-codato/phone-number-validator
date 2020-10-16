@@ -98,7 +98,8 @@ sub executeQuery
     if (defined($params))
     {   my $index = 0;
         map {   $sth->bind_param(++$index, $_);
-                Utils::Log::getLogger()->debug("Persistence::InMemoryDB: executeQuery; param $index = ", $_);
+                Utils::Log::getLogger()->debug(
+                    "Persistence::InMemoryDB: executeQuery; param $index = ", (defined($_) ? $_ : ''));
         } @$params;
     }
 
