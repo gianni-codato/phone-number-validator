@@ -80,10 +80,11 @@ $t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
 $log->debug('checkNumbers ' . Dumper($t->tx->res->body));
 
 
-my $file_name = 't/Pre-selezione. South_African_Mobile_Numbers.csv';
+my $src_dir = Utils::Config::getSrcDir();
+my $file_name = $src_dir . '/../t/Pre-selezione. South_African_Mobile_Numbers.csv';
 my $file_content;
 {   local $/ = undef;
-    open(my $fh, '<:encoding(UTF-8)', $file_name);
+    open(my $fh, '<:encoding(UTF-8)', $file_name) or die("cannot open test file $file_name");
     binmode($fh);
     $file_content = <$fh>;
     $log->debug('checkNumbers - example filec content' . $file_content);

@@ -23,7 +23,7 @@ my $build_phone_number = sub
 
 my $build_response_object_from_validator = sub
 {   my($validatorResult) = @_;
-    return 
+    return (!defined($validatorResult) ? undef :
     {   validation => 
         {   algoritm            => $validatorResult->validator->name,
             result              => $validatorResult->resultType,
@@ -35,7 +35,7 @@ my $build_response_object_from_validator = sub
             originalNumber      => $validatorResult->phoneNumber->rawNum,
             normalizedNumber    => $validatorResult->normalizedNumber,
         }
-    };
+    });
 };
 
 my $secret = 'this is not realy a secret!';
@@ -49,6 +49,8 @@ my $get_auth_user_from_request_sub = sub
 
     my $userDataSource = Persistence::DataSourceManager::getDataSource('users');
     return undef unless my $user = $userDataSource->selectUser($loginName);
+    Utils::Log::debugWithDump('Rest::AppController::$get_auth_user_from_request_sub: user=', $user);
+
     return $user;
 };
 
@@ -114,6 +116,11 @@ sub getSingleNumberById
     
     # invoke the right business logic and catch the result
     my $user = $get_auth_user_from_request_sub->($c->req);
+    if (!defined($user))
+    {   $c->render(text => '401 - Not authenticated', status => 401);
+        return;
+    }
+
     my $result = Rest::App::getContext()->getNumberById($id, $user);
     Utils::Log::debugWithDump('Rest::AppController::getSingleNumberById: result=', $result);
     
@@ -129,6 +136,11 @@ sub getSingleNumberAuditById
     
     # invoke the right business logic and catch the result
     my $user = $get_auth_user_from_request_sub->($c->req);
+    if (!defined($user))
+    {   $c->render(text => '401 - Not authenticated', status => 401);
+        return;
+    }
+
     my $result = Rest::App::getContext()->getAuditNumberById($id, $user);
     Utils::Log::debugWithDump('Rest::AppController::getSingleNumberAuditById: result=', $result);
     

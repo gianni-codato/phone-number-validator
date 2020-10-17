@@ -66,7 +66,7 @@ sub checkNumbers
 sub getNumberById
 {   my $self = shift; my($id, $user) = @_;
 
-    return undef unless defined($user); # only authenticated users can persist data into the database
+    return undef unless defined($user); # only authenticated users can access the database
 
     $pn_data_source = Persistence::DataSourceManager::getDataSource('phoneNumbers') if (!defined($pn_data_source));
     
@@ -78,7 +78,7 @@ sub getNumberById
 sub getAuditNumberById
 {   my $self = shift; my($id, $user) = @_;
 
-    return undef unless defined($user); # only authenticated users can persist data into the database
+    return undef unless defined($user); # only authenticated users can access into the database
 
     $pn_data_source = Persistence::DataSourceManager::getDataSource('phoneNumbers') if (!defined($pn_data_source));
     

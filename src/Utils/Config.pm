@@ -19,13 +19,12 @@ my $get_env_entry_with_default = sub
 
 
 
-my $mode; # develop/prod
+my $mode = 'prod'; # develop/prod
 sub getMode 
-{   return defined($mode) ? $mode : 'prod';
+{   return $mode;
 }
-sub setDevelopMode
-{   $mode = 'develop';
-}
+sub setDevelopMode { $mode = 'develop'; }
+sub setProdMode    { $mode = 'prod'; }
 
 
 
@@ -43,7 +42,7 @@ sub getValidatorName
 
 
 sub getDataSourceDir
-{   return $get_env_entry_with_default->('PHONE_NUMBER_DATASOURCE', 'work/data');
+{   return $get_env_entry_with_default->('PHONE_NUMBER_DATASOURCE_DIR', 'work/data');
 }
 
 
@@ -51,5 +50,10 @@ sub getDefaultLanguageCode
 {   return $get_env_entry_with_default->('PHONE_NUMBER_DEFAULT_LANGUAGE_CODE', 'en-US');
 }
 
+
+
+sub getSrcDir
+{   return $get_env_entry_with_default->('PHONE_NUMBER_SRC_DIR', 'src');
+}
 
 1;
