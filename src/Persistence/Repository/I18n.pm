@@ -14,7 +14,8 @@ sub initDb
         (   message_key             varchar(80)     not null
         ,   language_code           varchar(5)      not null
         ,   message_value           varchar(255)    not null
-            -- PRIMARY KEY (message_key, language_code)
+        
+        ,   PRIMARY KEY (message_key, language_code)
         );
 
         INSERT INTO i18n_message VALUES

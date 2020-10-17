@@ -9,7 +9,7 @@ package Persistence::DataSourceManager;
 use Utils::Log;
 use Persistence::Repository::I18n;
 use Persistence::Repository::Users;
-use Persistence::Repository::PhoneNumber;
+use Persistence::Repository::PhoneNumbers;
 use Utils::Config;
 use File::Path qw(make_path);
 
@@ -28,15 +28,14 @@ sub getDataSource
         }
         
         my $mode = Utils::Config::getMode();
-Utils::Log::getLogger()->info("\n", '$dataSourceName/$mode=', "$dataSourceName/$mode");
         $data_sources = ($mode eq 'develop' 
         ?   {   i18n            => Persistence::Repository::I18n->          new(name => ':memory:'),
                 users           => Persistence::Repository::Users->         new(name => ':memory:'),
-                phoneNumbers    => Persistence::Repository::PhoneNumber->   new(name => ':memory:'),
+                phoneNumbers    => Persistence::Repository::PhoneNumbers->  new(name => ':memory:'),
             }
         :   {   i18n            => Persistence::Repository::I18n->          new(name => $path . '/I18n.db'),
                 users           => Persistence::Repository::Users->         new(name => $path . '/Users.db'),
-                phoneNumbers    => Persistence::Repository::PhoneNumber->   new(name => $path . '/PhoneNumbers.db'),
+                phoneNumbers    => Persistence::Repository::PhoneNumbers->  new(name => $path . '/PhoneNumbers.db'),
             }
         );
     }

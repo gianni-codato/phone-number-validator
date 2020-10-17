@@ -10,7 +10,7 @@ use File::Basename qw( basename );
 use Utils::Config;
 
 Utils::Config::setDevelopMode();
-Utils::Log::getLogger()->info('Executing tests: ',  basename($0));
+Utils::Log::getLogger()->info('Executing tests: ' . basename($0));
 
 
 my $pn = Model::PhoneNumber->new(id => 103343262, rawNum => '6478342944');

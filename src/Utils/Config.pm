@@ -30,20 +30,25 @@ sub setDevelopMode
 
 
 sub getLogDir
-{   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_DIR', 'work/log')
+{   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_DIR', 'work/log');
 }
 sub getLogLevel
-{   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_LEVEL', 'info')
+{   return $get_env_entry_with_default->('PHONE_NUMBER_LOG_LEVEL', (getMode() eq 'develop' ? 'debug' : 'info'));
 }
 
 
 sub getValidatorName
-{   return $get_env_entry_with_default->('PHONE_NUMBER_VALIDATOR', 'standard')
+{   return $get_env_entry_with_default->('PHONE_NUMBER_VALIDATOR', 'standard');
 }
 
 
 sub getDataSourceDir
-{   return $get_env_entry_with_default->('PHONE_NUMBER_DATASOURCE', 'work/data')
+{   return $get_env_entry_with_default->('PHONE_NUMBER_DATASOURCE', 'work/data');
+}
+
+
+sub getDefaultLanguageCode
+{   return $get_env_entry_with_default->('PHONE_NUMBER_DEFAULT_LANGUAGE_CODE', 'en-US');
 }
 
 

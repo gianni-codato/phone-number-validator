@@ -13,9 +13,11 @@ sub initDb
 
     my $init_db = "
         CREATE TABLE user
-        (   login_name              varchar(80) primary key
+        (   login_name              varchar(80) not null
         ,   hashed_password         varchar(80) not null
         ,   language_code           char(5)     not null
+
+        ,   PRIMARY KEY (login_name)
         );
 
         INSERT INTO user VALUES
@@ -41,6 +43,7 @@ sub selectUser
     
     if (scalar(@$select_result_set) > 0)
     {   my $db_row = $select_result_set->[0];
+        # my simple ORM...
         return Model::User->new(
             loginName       => $db_row->{login_name},
             hashedPassword  => $db_row->{hashed_password},

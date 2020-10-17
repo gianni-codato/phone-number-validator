@@ -4,21 +4,27 @@ use Moose;
 
 use Model::PhoneNumber;
 use Utils::Log;
+use Utils::Config;
 use Persistence::DataSourceManager;
+use Digest::MD5 qw(md5_hex);
+use Model::User;
 
 
-has 'validator' => (does => 'Logic::Validator'                      , is => 'rw', required => 1);
+has 'validator' => (does => 'Logic::Validator', is => 'rw', required => 1);
 
 
-my $data_source;
+my $pn_data_source;
 sub checkSingleNumber
 {   my $self = shift; my($phoneNumber, $user) = @_;
     Utils::Log::getLogger()->debug("Logic::AppLogic: checkSingleNumber invoked");
 
-    my $validator_result = $self->validator->validate($phoneNumber, $user);
+    my $languageCode = (defined($user) ? $user->languageCode : Utils::Config::getDefaultLanguageCode());
+    my $validator_result = $self->validator->validate($phoneNumber, $languageCode);
 
-    $data_source = Persistence::DataSourceManager::getDataSource('phoneNumbers') if (!defined($data_source));
-    $data_source->insertOrReplaceValidation($validator_result);
+    if (defined($user)) # only authenticated users can persist data into the database
+    {   $pn_data_source = Persistence::DataSourceManager::getDataSource('phoneNumbers') if (!defined($pn_data_source));
+        $pn_data_source->insertOrReplaceValidation($validator_result, $user);
+    }
 
     return $validator_result;
 }
@@ -53,6 +59,49 @@ sub checkNumbers
     });
 
     return \@validator_result_list;
+}
+
+
+
+sub getNumberById
+{   my $self = shift; my($id, $user) = @_;
+
+    return undef unless defined($user); # only authenticated users can persist data into the database
+
+    $pn_data_source = Persistence::DataSourceManager::getDataSource('phoneNumbers') if (!defined($pn_data_source));
+    
+    return $pn_data_source->selectValidationById($id);
+}
+
+
+
+sub getAuditNumberById
+{   my $self = shift; my($id, $user) = @_;
+
+    return undef unless defined($user); # only authenticated users can persist data into the database
+
+    $pn_data_source = Persistence::DataSourceManager::getDataSource('phoneNumbers') if (!defined($pn_data_source));
+    
+    return $pn_data_source->selectValidationAuditById($id);
+}
+
+
+
+# the authentication logic should be put in a separate module, but for this simple excercise can stay here
+my $user_data_source;
+sub authenticate
+{   my $self = shift; my($loginName, $password) = @_;
+    Utils::Log::getLogger()->debug("Logic::AppLogic: authenticate $loginName, $password");
+
+    $user_data_source = Persistence::DataSourceManager::getDataSource('users') if (!defined($user_data_source));
+    my $user = $user_data_source->selectUser($loginName);
+
+    if (defined($user))
+    {   my $md5_hex = md5_hex($password);
+        return $user if ($user->hashedPassword eq $md5_hex); # authenticated
+    }
+
+    return undef; # not authenticated
 }
 
 

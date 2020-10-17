@@ -60,10 +60,10 @@ sub validate
 }
 
 
-
+# a very simple form (...hard-coded) of "resource bundle"...
 my $code_descriptions =
 {   I1 => 'The phone number is incorrect because is neither a simple one nor a deleted one',
-    I2 => 'The phone number has an incorrect format: it should be composed by 9 (without international prefix) or 11 (with international prefix) digits',
+    I2 => 'The phone number has an incorrect format: it should be composed by 9 (without international prefix) or 11 (with international prefix) digits and the prefix must be 27',
     I3 => 'The phone number is absent',
     C1 => 'The phone number is no longer active (deleted but without date/time specification): the information about that deactivation have being removed from the number',
     C2 => 'The phone number is no longer active (deletion date/time: %s): the information about that deactivation have being removed from the number',

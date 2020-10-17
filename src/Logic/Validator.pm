@@ -1,11 +1,13 @@
 package Logic::Validator;
+# interface for all validators
+
 
 use Moose::Role;
 
 # requires that the concrete class implements the validate method
 requires 'validate';
 
-# mostly for debugging purpouse
+
 has 'name' => (isa => 'Str', is => 'ro', required => 1);
 
 

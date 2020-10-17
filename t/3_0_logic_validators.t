@@ -14,7 +14,8 @@ use File::Basename qw( basename );
 use Utils::Config;
 
 Utils::Config::setDevelopMode();
-Utils::Log::getLogger()->info('Executing tests: ', basename($0));
+my $log = Utils::Log::getLogger();
+$log->info('Executing tests: ' . basename($0));
 
 
 # testing a simple validator: 1a) manual instantiation
@@ -75,14 +76,14 @@ $validatorResult = $validator->validate($pn);
 is(blessed($validatorResult), 'Model::ValidatorResult');
 is($validatorResult->resultType, 'ACCEPTABLE', 'Standard validator - acceptable number - type');
 is($validatorResult->resultCode, 'A1', 'Standard validator - acceptable number - code');
-# diag(Dumper($validatorResult));
+$log->debug('Standard validator - acceptable number: ' . Dumper($validatorResult));
 
 $pn = Model::PhoneNumber->new(id => 103343262, rawNum => '000478342944');
 $validatorResult = $validator->validate($pn);
 is(blessed($validatorResult), 'Model::ValidatorResult');
 is($validatorResult->resultType, 'INCORRECT', 'Standard validator - incorrect number (1) - type');
 is($validatorResult->resultCode, 'I2', 'Standard validator - incorrect number (1) - code');
-# diag(Dumper($validatorResult));
+$log->debug('Standard validator - incorrect number (1) ' . Dumper($validatorResult));
 
 $pn = Model::PhoneNumber->new(id => 103343262, rawNum => '_DELETED_');
 $validatorResult = $validator->validate($pn);
@@ -92,19 +93,19 @@ is($validatorResult->resultCode, 'I3', 'Standard validator - incorrect number (2
 
 $pn = Model::PhoneNumber->new(id => 103343262, rawNum => '27735405794_DELETED_1456789200');
 $validatorResult = $validator->validate($pn);
-is(blessed($validatorResult), 'Model::ValidatorResult');
-is($validatorResult->resultType, 'CORRECTED', 'Standard validator - corrected - type');
+is(blessed($validatorResult), 'Model::ValidatorResult', 'Standard validator - corrected - type');
+is($validatorResult->resultType, 'CORRECTED', 'Standard validator - corrected - result type');
 is($validatorResult->resultCode, 'C2', 'Standard validator - corrected - code');
-# diag(Dumper($validatorResult));
+$log->debug('Standard validator - corrected ' . Dumper($validatorResult));
 
 
 
 $validator = $manager->getValidator('standardI18n');
 $pn = Model::PhoneNumber->new(id => 103343262, rawNum => '27478342944');
 $validatorResult = $validator->validate($pn, 'it-IT');
-# diag(Dumper($validatorResult));
-is(blessed($validatorResult), 'Model::ValidatorResult');
-is($validatorResult->resultType, 'ACCEPTABLE', 'Validating an incorrect number');
+$log->debug('Validating with i18n ' . Dumper($validatorResult));
+is(blessed($validatorResult), 'Model::ValidatorResult', 'Validating with i18n');
+is($validatorResult->resultType, 'ACCEPTABLE', 'Validating with i18n - type');
 is($validatorResult->resultDescription, 'Il numero di telefono è corretto', 'Validating i18n description');
 
 

@@ -9,7 +9,7 @@ use File::Basename qw( basename );
 use Utils::Config;
 
 Utils::Config::setDevelopMode();
-Utils::Log::getLogger()->info('Executing tests: ', basename($0));
+Utils::Log::getLogger()->info('Executing tests: ' . basename($0));
 
 
 # test for config module
@@ -18,10 +18,10 @@ is(Utils::Config::getLogDir(), 'prova_dir', 'log dir - specified value');
 delete($ENV{PHONE_NUMBER_LOG_DIR});
 is(Utils::Config::getLogDir(), 'work/log', 'log dir - default value');
 
-$ENV{PHONE_NUMBER_LOG_LEVEL} = 'debug';
-is(Utils::Config::getLogLevel(), 'debug', 'log level - specified value');
+$ENV{PHONE_NUMBER_LOG_LEVEL} = 'fatal';
+is(Utils::Config::getLogLevel(), 'fatal', 'log level - specified value');
 delete($ENV{PHONE_NUMBER_LOG_LEVEL});
-is(Utils::Config::getLogLevel(), 'info', 'log level - default value');
+is(Utils::Config::getLogLevel(), 'debug', 'log level - default value');
 
 $ENV{PHONE_NUMBER_VALIDATOR} = 'prova_validator';
 is(Utils::Config::getValidatorName(), 'prova_validator', 'validator name - specified value');

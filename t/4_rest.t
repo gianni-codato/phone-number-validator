@@ -14,7 +14,8 @@ use File::Basename qw( basename );
 use Utils::Config;
 
 Utils::Config::setDevelopMode();
-Utils::Log::getLogger()->info('Executing tests: ',  basename($0));
+my $log = Utils::Log::getLogger();
+$log->info('Executing tests: ' . basename($0));
 
 
 
@@ -26,7 +27,7 @@ my $t = Test::Mojo->new($mojoApp);
 ok(defined($t), 'created a mojo test object');
 
 $t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 27478342944 })
-   ->status_is(200, 'check response status')
+   ->status_is(200, 'checkSingleNumber: check response status')
    ->json_is(
         {   validation => 
             {   algoritm            => 'standard',
@@ -40,7 +41,7 @@ $t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 274783429
                 normalizedNumber    => '+(27) 478 342944',
             }
         });
-# diag(Dumper($t->tx->res->body));
+$log->debug('checkSingleNumber ' . Dumper($t->tx->res->body));
 
 
 my $csvContent = <<'EOF';
@@ -49,7 +50,7 @@ id,sms_phone
 10334326,27478342944
 EOF
 $t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
-   ->status_is(200, 'check response status')
+   ->status_is(200, 'checkNumbers: check response status')
    ->json_is(
         [   {   validation => 
                 {   algoritm            => 'standard',
@@ -76,7 +77,7 @@ $t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
                 }
             },
         ]);
-# diag(Dumper($t->tx->res->body));
+$log->debug('checkNumbers ' . Dumper($t->tx->res->body));
 
 
 my $file_name = 't/Pre-selezione. South_African_Mobile_Numbers.csv';
@@ -85,17 +86,40 @@ my $file_content;
     open(my $fh, '<:encoding(UTF-8)', $file_name);
     binmode($fh);
     $file_content = <$fh>;
-    # diag("contenuto del file: ", $file_content);
+    $log->debug('checkNumbers - example filec content' . $file_content);
 }
 my $form = { phoneNumbersFile => { filename => $file_name, content => $file_content } };
 $t->post_ok('/checkNumbers', form => $form)
-    ->status_is(200, 'check response status');
-# my $body = $t->tx->res->body;
-# diag(Dumper($body));
+    ->status_is(200, 'checkNumbers - example file');
+$log->debug('checkNumbers - example file' . Dumper($t->tx->res->body));
 
 
-$t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 27478342944 })
-   ->status_is(200, 'check response status');
-# diag(Dumper($t->tx->res->body));
+
+$t->post_ok('/authenticate', form => { loginName => 'codato', password => 'gianni' })
+   ->status_is(200, 'authenticate');
+my $jwtToken = $t->tx->res->body;
+is($jwtToken, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
+            . '.eyJsb2dpbk5hbWUiOiJjb2RhdG8ifQ'
+            . '.2WitgMqh2bKGYVxY_4l2O7hLjJfuQLn4RmHonDMu6uU'
+            , 'authenticate: jwtToken');
+
+
+my $headers = { Authorization => "Bearer $jwtToken" };
+$t->post_ok('/checkSingleNumber' => $headers => form => { id => 103343262, number => 27478342944 })
+    ->status_is(200);
+$log->debug('checkSingleNumber - with authentication' . Dumper($t->tx->res->body));
+
+
+
+$t->post_ok('/checkSingleNumber' => $headers => form => { id => 103343262, number => 27478342944 })
+    ->status_is(200);
+
+$t->get_ok('/getSingleNumberById' => $headers => form => { id => 103343262 })
+    ->status_is(200);
+
+$t->get_ok('/getSingleNumberAuditById' => $headers => form => { id => 103343262 })
+    ->status_is(200);
+
+
 
 done_testing();

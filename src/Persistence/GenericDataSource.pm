@@ -98,7 +98,7 @@ sub executeQuery
     {   my $index = 0;
         map {   $sth->bind_param(++$index, $_);
                 Utils::Log::getLogger()->debug(
-                    "Persistence::GenericDataSource: executeQuery; param $index = ", (defined($_) ? $_ : ''));
+                    "Persistence::GenericDataSource: executeQuery; param $index = " . (defined($_) ? $_ : ''));
         } @$params;
     }
 

@@ -1,11 +1,19 @@
 use strict;
 use warnings;
 
-# use Mojo::Server::Hypnotoad;
 use Mojo::Server::Morbo;
+use App::Prove;
+use File::Basename qw( fileparse );
+use File::Spec;
 
-use File::Basename qw( basename );
-my $basename = basename($0);
+use TAP::Harness;
+
+# get the absolute path of the 'src' dir of the project; needed for @INC
+my($basename, $path) = fileparse($0);
+my $abs_pth = File::Spec->rel2abs($path);
+print "\n$abs_pth\n";
+push(@INC, $abs_pth);
+chdir($abs_pth);
 
 my $help_msg;
 my $welcome_msg;
@@ -15,111 +23,83 @@ my $server_instance;
 my $server_pid;
 
 
-sub getCommand()
+sub getCommand
 {   my $printPrompt = sub { print "\n> " }; 
     
     $printPrompt->();
-    while (my $command = <STDIN>)
-    {   chomp($command);
+    while (my $input = <STDIN>)
+    {   chomp($input);
+        print "\n<$input>";
+        my($command, @params) = split(' ', $input);
 
         if ($command eq 'help')
         {   print $help_msg;
         }
-        if ($command eq 'exit' || $command eq 'quit')
-        {   # TODO: stop a server
-            print "See you soon!";
+        elsif ($command eq 'exit' || $command eq 'quit')
+        {   print "See you soon!";
             exit(0);
         }
         elsif ($command eq 'setup')
-        {
+        {   setup(@params);
         }
-        elsif ($command eq 'tests')
-        {
+        elsif ($command eq 'run-tests')
+        {   # (my $prove = App::Prove->new)->process_args('-I' . $abs_pth, $abs_pth . '/../t/');
+            # $prove->run;
+            TAP::Harness
         }
-        elsif ($command eq 'server-start')
-        {   my $pid_file_name = 'tmp/server.pid';
-            
-            my $server_pid = fork;
-            if ($server_pid) 
-            {   # I'm the child (Server)
-                print("\nfather - server_pid=", $server_pid, "; \$\$=", $$);
-                open FH, '>pid.pid';
-                print FH $$;
-                close FH;
-
-                push(@INC, 'src');
-                $server_instance = Mojo::Server::Morbo->new;
-                $server_instance->run('src/Rest/App.pm');
-                
-            }
-            else 
-            {   open FH2, '<pid.pid';
-                my $pid = <FH2>;
-                close FH2;
-                sleep(5);
-                kill('INT', $pid);
-            
-                print("\nchild - server_pid=", $server_pid, "; \$\$=", $$);
-                # I'm in the father (CLI)
-                print "\nThis is the child pid = $server_pid";
-            }
-        }
-        elsif ($command eq 'server-stop')
-        {   open FH2, '<pid.pid';
-            my $pid = <FH2>;
-            close FH2;
-            # $server_instance->stop(); # stop accepting request
-            print "\ntrying to kill '$server_pid', '$pid'";
-            kill('TERM', $pid);
-
+        elsif ($command eq 'start-server')
+        {   Mojo::Server::Morbo->new->run('Rest/App.pl');
         }
         else
-        {   # errore
+        {   print "unrecognized command '$command'";
         }
 
         $printPrompt->();
     }
 }
 
-# HELP
-# INIT (per i db?)
-# DEPLOY ?
-# RUN TEST use App::Prove; (my $a = App::Prove->new)->process_args('-Isrc', 't'); $a->run;
-# SERVER START use Mojo::Server::Morbo; Mojo::Server::Morbo->new->run('src/Rest/App.pm');
-# SERVER STOP
-
-# EXIT
 
 
 
 $help_msg = <<EOM;
-Syntax:
-    $basename <command> <options>
+The format of every command is:
+    <command> [parameters]
 
-where <command> is one of following:
-    help
-        display this help message
-    quit
-    exit
-        both commands terminate the CLI
-    setup
-        prepare the enviroment for running the server and the unit-tests;
-        TODO: if you run setup again after having already used the application...
-    tests
-        run the unit tests and display the results
-    server-start
-        run one instance of the server (agaist which you can send request with your
-        favourite client --e.g. curl-- or you can validate number using a browser)
-    server-stop
-        shutdown the istance of the running server
+Here are the commands details (other then help/quit/exit):
+
+    setup [user-name user-password language]
+        prepare the enviroment for running the server;
+        every time you run the setup command the project is re-configured again to its initial state and you
+        will lose the previous configuration and data; type 'help setup' for more information about parameters
+    
+    run-tests 
+        run the unit tests and display the results; type 'help run-tests' for more informations about tests 
+        and how to run them from the command line
+
+    start-server [validator-type]
+        run one instance of the server (against which you can send requests with your favourite client --e.g. 
+        curl-- or you can validate phone numbers using a browser); type CTRL+Inter to stop the server; type 
+        'help start-server' for more informations about the validator-type parameter and how to start the
+        server from the command line (this way you have more control over the server configuration)
+
+
+
+        
+        
+        Tests can also be run directly from the command line (without this CLI), using the standard 'prove' utility; type
+        prove -I<src-path> <test-path>
+        where <src-path> is the path to the 'src' directory of the project, while <test-path> is the path to the 't' dir
+        (if your current dir is the root of the project simply type 'prove -Isrc t').
 EOM
+
+
 
 $welcome_msg = <<EOM;
+
 Welcome to the Phone Number Exercise CLI
-Type 'help' for the list of available commands
+Type 'help' for the list of available commands with a brief explanation
+Type 'help <command>' to a detailed explanation of a single command and its parameters
+Type 'quit' or 'exit' to stop the CLI
 EOM
-
-
 print $welcome_msg;
 getCommand();
-
