@@ -1,4 +1,5 @@
 package Logic::Validator::StandardI18n;
+# implementation of validator (see the documentation for forther details)
 
 use Moose;
 

@@ -1,9 +1,11 @@
 package Persistence::DataSourceManager;
-# this package provides db connection to every other module of the application
+# this package provides db connections to every other module of the application
+# it returns a connection to a real persistent db or to a volatile in-menory one
+# based on the value of the "application mode" (develop=test or prod=normal)
 
 # in a real application this sub should return a connection taken from a pool or
-# create a new connection, using connection parameters (host, port, username, password, etc)
-# from some secret manager or secure ad-hoc storage; but this is a "demo" app... 
+# create a new connection, using connection parameters (host, port, username, password,
+# etc) from some secret manager or secure ad-hoc storage; but this is a "demo" app... 
 # so keep it simple! yet not so nice!
 
 use Utils::Log;

@@ -1,14 +1,15 @@
 package Rest::AppController;
-# the purpose of this package is to expose the subs that implement the logic behind the rest
-# interface; every sub play the role of an adapter that extract the parameters from the request,
-# invoke che right business logic functionality providing those parameters, capture the result
-# and build the response with that result
+# the purpose of this package is to implements the subs that are behind the endpoints of the applciation
+# routes defined in Rest::App; every sub play the role of an adapter that extracts the parameters from
+# the request, invokes the right business logic functionality (providing those parameters), capture the
+# result and build the response with that result
 
 use Model::PhoneNumber;
 use Utils::Log;
 use Mojo::JWT;
 
 
+# home page welcome message!... it's a ping...
 sub home
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::home invoked");
@@ -16,11 +17,13 @@ sub home
 }
 
 
+# private utily sub to create a PhoneNumber obj from the scalar parameters
 my $build_phone_number = sub
 {   my($id, $rawNum) = @_;
     return Model::PhoneNumber->new(id => $id, rawNum => $rawNum);
 };
 
+# private utily sub to create the object to be JSON-serialized from the ValidatorResult object
 my $build_response_object_from_validator = sub
 {   my($validatorResult) = @_;
     return (!defined($validatorResult) ? undef :
@@ -38,7 +41,10 @@ my $build_response_object_from_validator = sub
     });
 };
 
+
+
 my $secret = 'this is not realy a secret!';
+# private utility sub to extract the autenticate user from the request header infos
 my $get_auth_user_from_request_sub = sub
 {   my($req) = @_;
 
@@ -56,7 +62,8 @@ my $get_auth_user_from_request_sub = sub
 
 
 
-# TODO: maybe processNumbers is better?
+# TODO: maybe processNumbers is a better name?
+# API endpoint (see the documentation)
 sub checkNumbers
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::checkNumbers invoked");
@@ -80,7 +87,8 @@ sub checkNumbers
 
 
 
-# TODO: maybe processSingleNumber is better?
+# TODO: maybe processSingleNumber is a better name?
+# API endpoint (see the documentation)
 sub checkSingleNumber
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::checkSingleNumber invoked");
@@ -99,6 +107,7 @@ sub checkSingleNumber
 
 
 
+# API endpoint
 # return the html page with a form to test for checking a single number
 sub testSingleNumber
 {   my $c = shift;
@@ -108,6 +117,7 @@ sub testSingleNumber
 
 
 
+# API endpoint (see the documentation)
 sub getSingleNumberById
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::getSingleNumberById invoked");
@@ -128,6 +138,7 @@ sub getSingleNumberById
     $c->render(json => $build_response_object_from_validator->($result));
 }
 
+# API endpoint (see the documentation)
 sub getSingleNumberAuditById
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::getSingleNumberAuditById invoked");
@@ -159,6 +170,7 @@ sub getSingleNumberAuditById
 
 
 
+# API endpoint (see the documentation)
 sub authenticate
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::authenticate invoked");

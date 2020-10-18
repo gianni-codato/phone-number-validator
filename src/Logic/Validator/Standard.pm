@@ -1,4 +1,5 @@
 package Logic::Validator::Standard;
+# implementation of validator (see the documentation for forther details)
 
 use Moose;
 use Model::ValidatorResult;

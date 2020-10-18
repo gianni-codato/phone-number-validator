@@ -1,4 +1,6 @@
 package Persistence::GenericDataSource;
+# the purpose of this package is to provide a base class for all repositories classes;
+# it include common subs to execute queries against the db
 
 use Moose;
 
@@ -8,6 +10,7 @@ use Utils::Log;
 
 # database handle
 has 'dbh'           => (isa => 'DBI::db', is => 'rw');
+# database name
 has 'name'          => (isa => 'Str'    , is => 'rw', required => 1);
 
 
@@ -31,7 +34,8 @@ sub BUILD
     $self->dbh($dbh);
 
     # check if the data source need initializazion
-    # this is a form of self-made abstract method!
+    # this is a form of self-made abstract method! (real abstract class need a Moose
+    # extension that isn't include in the project to avoid external dependencies)
     if (ref($self) ne 'Persistence::GenericDataSource') 
     {   my $main_table_name = $self->getMainTableName() ; # astract method
         my $is_init_required = $isInitRequired->($self, $main_table_name);
@@ -40,6 +44,7 @@ sub BUILD
 }
 
 
+# introspection on the db metedata, to decide if the db need initialization or not
 my $search_table = "
     SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?;
 ";
@@ -64,6 +69,7 @@ sub commitTran
 }
 
 
+# execute more statements (separated by ';') that are in the sql string passed as parameter
 sub multiStatementQuery
 {   my $self = shift; my($multiStatementQuery, $params, $flagArrayRow) = @_;
     Utils::Log::getLogger()->debug("Persistence::GenericDataSource: multiStatementQuery=$multiStatementQuery");
@@ -84,7 +90,8 @@ sub multiStatementQuery
 # return an array-ref with the result-set rows otherwise: every row
 # will be an array-ref (for positional field access) or an hash-ref
 # (default, for named field access), based on the $flagArrayRow 
-# parameter value
+# parameter value; $params contains the values for '?' placeholders
+# present in the sql string
 sub executeQuery
 {   my $self = shift; my($statement, $params, $flagArrayRow) = @_;
     Utils::Log::getLogger()->debug("Persistence::GenericDataSource: flagArrayRow=" 

@@ -1,4 +1,5 @@
 package Logic::AppLogic;
+# this package is the core of the business logic of the application
 
 use Moose;
 
@@ -10,10 +11,15 @@ use Digest::MD5 qw(md5_hex);
 use Model::User;
 
 
+# the validator instance that should be used for all validation operation
+# it is injected upon object construction
 has 'validator' => (does => 'Logic::Validator', is => 'rw', required => 1);
 
 
-my $pn_data_source;
+my $pn_data_source; # PhoneNumber data-source cache
+# Main logic action
+# receive a PhoneNumber instance to be validated; if the user passed in is valid, the 
+# validation result is also stored in the proper data-source
 sub checkSingleNumber
 {   my $self = shift; my($phoneNumber, $user) = @_;
     Utils::Log::getLogger()->debug("Logic::AppLogic: checkSingleNumber invoked");
@@ -30,8 +36,8 @@ sub checkSingleNumber
 }
 
 
-# private utility sub
-# $processorSub is a sub that receive the list elements that are on a single line and process them
+# private utility sub that receive the csv content and process it line by line
+# the $processorSub parameter is a sub that receive the list elements that are on a single line and process them
 my $process_csv_lines = sub
 {   my($csvContent, $processorSub) = @_;
 
@@ -46,6 +52,8 @@ my $process_csv_lines = sub
 };
 
 
+# Main logic action
+# receive a cvs file content and every line is processed through the checkSingleNumber sub
 sub checkNumbers
 {   my $self = shift; my($csvContent, $user) = @_;
     Utils::Log::getLogger()->debug("Logic::AppLogic: checkNumbers invoked");
@@ -64,6 +72,8 @@ sub checkNumbers
 
 
 
+# Main logic action
+# if the supplied user is valid, retrieve the current validation for the supplied id
 sub getNumberById
 {   my $self = shift; my($id, $user) = @_;
 
@@ -76,6 +86,8 @@ sub getNumberById
 
 
 
+# Main logic action
+# if the supplied user is valid, retrieve the history of validations (audit) for the supplied id
 sub getAuditNumberById
 {   my $self = shift; my($id, $user) = @_;
 
@@ -88,8 +100,10 @@ sub getAuditNumberById
 
 
 
-# the authentication logic should be put in a separate module, but for this simple excercise can stay here
-my $user_data_source;
+my $user_data_source; # Users data-source cache
+# Main logic action
+# TODO: the authentication logic should be put in a separate module, but for this simple excercise can stay here
+# check the validity of the user and password provided as input
 sub authenticate
 {   my $self = shift; my($loginName, $password) = @_;
     Utils::Log::getLogger()->debug("Logic::AppLogic: authenticate $loginName, $password");

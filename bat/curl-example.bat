@@ -12,7 +12,6 @@ pause
 curl -d "loginName=codato&password=gianni" -X POST http://localhost:3000/v1/authenticate
 pause
 
-
 SET JWT=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbk5hbWUiOiJjb2RhdG8ifQ.2WitgMqh2bKGYVxY_4l2O7hLjJfuQLn4RmHonDMu6uU
 
 

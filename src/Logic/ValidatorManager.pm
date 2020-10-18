@@ -1,4 +1,5 @@
 package Logic::ValidatorManager;
+# this package provides a mean to get the correct validator instance to all other modules of the application
 
 use Moose;
 

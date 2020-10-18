@@ -15,8 +15,9 @@ my $app_instance;   # the singleton Mojolicious::Lite instance
 my $app_context;    # the singleton Logic::AppLogic instance
 
 my $build_app_instance; # private sub pre-declaration
-my $build_app_context; # private sub pre-declaration
+my $build_app_context;  # private sub pre-declaration
 
+# access the singleton Mojolicious::Lite instance
 sub getInstance
 {   
     if (!defined($app_instance)) 
@@ -25,6 +26,7 @@ sub getInstance
     }
     return $app_instance;
 }
+# access the singleton Logic::AppLogic instance
 sub getContext
 {
     if (!defined($app_instance)) 
@@ -35,7 +37,7 @@ sub getContext
 }
 
 
-
+# this sub provide a way for injecting a validator programmatically (instead of using environment variable)
 sub setValidator
 {   my($validatorName) = @_;
     Utils::Log::getLogger()->info("Rest::App::setValidator: changing application validator to $validatorName");
@@ -45,8 +47,10 @@ sub setValidator
 }
 
 
+# build the singleton Mojolicious::Lite instance
 $build_app_instance = sub
 {
+    # for serving static content
     push @{app->static->paths} => 'Rest/static';
     push @{app->static->paths} => '/Rest/static';
 
@@ -86,6 +90,7 @@ $build_app_instance = sub
 };
 
 
+# build the singleton Logic::AppLogic instance
 $build_app_context = sub
 {
     # set-up application validation layer
