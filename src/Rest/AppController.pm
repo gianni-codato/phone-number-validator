@@ -56,7 +56,7 @@ my $get_auth_user_from_request_sub = sub
 
 
 
-# TODO: check -> process
+# TODO: maybe processNumbers is better?
 sub checkNumbers
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::checkNumbers invoked");
@@ -80,7 +80,7 @@ sub checkNumbers
 
 
 
-# TODO: check -> process
+# TODO: maybe processSingleNumber is better?
 sub checkSingleNumber
 {   my $c = shift;
     Utils::Log::getLogger()->info("Rest::AppController::checkSingleNumber invoked");
