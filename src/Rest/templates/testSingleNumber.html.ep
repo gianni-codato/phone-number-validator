@@ -14,10 +14,6 @@
             var jsonResponseData = response.data
             console.log(jsonResponseData.phoneNumber)
 
-            document.getElementById('output-number').innerHTML = jsonResponseData.phoneNumber.normalizedNumber;
-            document.getElementById('output-result').innerHTML = jsonResponseData.validation.result
-            document.getElementById('output-description').innerHTML = jsonResponseData.validation.statusDescription
-
             document.getElementById('output-number').value = jsonResponseData.phoneNumber.normalizedNumber;
             document.getElementById('output-result').value = jsonResponseData.validation.result
             document.getElementById('output-description').value = jsonResponseData.validation.statusDescription
@@ -28,7 +24,10 @@
           
           })
           .catch(function (error) {
-            console.log('response KO'); console.log(error)
+            console.log('response KO');
+            console.log(error)
+            document.getElementById('errors').innerHTML = '<td colspan="4">' + error + '</td>'
+            document.getElementById('errors').style.display = 'table-row';
           })
       }
 
@@ -36,6 +35,7 @@
             document.getElementById('row-number').style.display = 'none';
             document.getElementById('row-result').style.display = 'none';
             document.getElementById('row-description').style.display = 'none';
+            document.getElementById('errors').style.display = 'none';
       }
     </script>
 
@@ -64,9 +64,6 @@
           <td><img src="/telephon_icon.png" style="width: 18px"></td>
           <td style="witdh=100px"><input style="margin-left: 30px" type="submit" onclick="execPost(event)"/></td>
         </tr>
-        <tr>
-          <td/><td/><td/>
-        </tr>
         <tr id="row-number" style="display: none">
           <td><span style="width: 300px">Acquired Number</span></td>
           <td><input style="width: 200px" type="text" id="output-number"/></td>
@@ -78,6 +75,9 @@
         <tr id="row-description" style="display: none">
           <td><span style="width: 300px">Validation Notes</span></td>
           <td><textarea style="width: 200px; height: 150px" id="output-description"></textarea></td>
+        </tr>
+        <tr id="errors" style="display: none">
+          <td colspan='4'></td>
         </tr>
       </table>
     </form>

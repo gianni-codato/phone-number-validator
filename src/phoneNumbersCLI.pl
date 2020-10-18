@@ -165,11 +165,11 @@ Authentication
         paragraph) and for writing (point 1).
     2- unauthenticated mode
         In this mode the caller cannot access the store, so he/she/it cannot either acquire nor modify any information about 
-        any id; so the only thing that is allowed is to check for the validity of a single number or alist of numbers (to keep
-        the things simple the endpoint for unauthenticated mode are the same as for authenticated mode and the different level
-        of authorization access to the db is automatically managed by the service business logic)
+        any id; so the only thing that is allowed to do is to check for the validity of a single number or a list of numbers
+        (to keep the things simple the endpoint for unauthenticated mode are the same as for authenticated mode and the
+        different level of authorization access to the db is automatically managed by the service business logic)
     
-    Technically, in the former case the service caller has to authenticate itself before all throgh a specific service
+    Technically, in the former case the service caller has to authenticate itself before all, throgh a specific service
     endpoint call: the authentication is done by supplying a login code and a password that are validated against a "user
     area" stored in the db (the passwords are hashed but without any salt, strong encryption, etc.... in the end this is only
     an exercise!). If the validation is done succesfully the service returns a JWT token that the caller have to include in
@@ -185,7 +185,7 @@ Authentication
 Validation
 --------
     The phone number schema for South Africa is +27 xxx yyyyyy (source: wikipedia). So the basic validation rule is that
-    the number must have 9 digits (without the international prefix) or 11 digits (but the firt two are 27).
+    the number must have 9 digits (without the international prefix) or 11 digits (but the firts two are 27).
 
     Moreover I imagined that this service could be exposed to different clients (e.g. in a B2B environment where there are
     more third parties phone numbers providers) and so there could be the need to customize the validation rules (e.g.
@@ -200,7 +200,7 @@ Validation
         besides the basic rules it tries to correct number that have '_DELETED_' additional information included; that
         additional information seems to refer to the fact that the number was deleted (and when, in a 'UNIX style 
         timestamp'); I supposed that the additional information was related to the business of the provider of the phone
-        number (the caller) but the phone number sould be anyway stored into the db after correction (as ana cceptable one)
+        number (the caller) but the phone number sould be anyway stored into the db after correction (as an acceptable one)
     - standardI18n
         it's like the standard validator but the description of every number validation that is returned to the caller
         is internationalized; this validator is suitable for a human interaction (while the standard one can be used
@@ -219,25 +219,26 @@ Server
     'morbo' server (a standard development server for Mojo ecosystem).
 
     The server can be easily started with the start-server CLI command, using the default configuration (see below).
-    You can also start the server from the command line: chenge the current working dir in the 'src' folder of the
-    project and type 'morbo Rest/App.pl' at the prompt. Using the command line you can change the configuration,
-    setting the environment variable before starting the server. After the server is up and running it prints the
-    address on which is listening (usually http://localhost:3000) and you can start doing request to it through
-    an http client.
+    You can also start the server directly from cmd.exe: change the current working dir in the 'src' folder of the
+    project and type 'morbo Rest/App.pl' at the prompt. With the latter way you can change the configuration,
+    setting the environment variable before starting the server (see the file bat/start-server.bat as an example: it
+    will start the server with standardI18n validator, that is not the default). After the server is up and running 
+    it prints the address on which is listening (e.g. http://localhost:3000) and you can start doing request to it
+    through an http client.
     
     The http://localhost:3000/v1/testSingleNumber endpoint is meant for browser interaction while the other
     endpoints constituite the core API and maybe are best queryed with somenthing like curl: you can find some
-    examples on how to interact with the server using curl in the bat/curl.bat file.
+    examples on how to interact with the server using curl in the bat/curl-example.bat file.
 
     The configuration of the server is done through environment variables:
-    - PHONE_NUMBER_LOG_LEVEL (default: debug for unit-tests, info fo rnormal use)
+    - PHONE_NUMBER_LOG_LEVEL (default: debug for unit-tests, info for normal use)
         the minimun level of logging made by the server; the increasing level list is: debug, info, warn, error and fatal
     - PHONE_NUMBER_LOG_DIR (dafault: work/log directory of the project)
-        the directory wher the log file (application.log) is written; the is always appended
+        the directory where the log file (application.log) is written; the log messages are always appended
     - PHONE_NUMBER_DATASOURCE_DIR (dafault: work/data directory of the project)
         the directory where the databases are located
-    - PHONE_NUMBER_VALIDATOR (default: standard, but the CLI start-server uses standardI18n)
-        the validator to use with the server
+    - PHONE_NUMBER_VALIDATOR (default: standard)
+        the validator to use with the server (the CLI start-server command forces standardI18n)
     - PHONE_NUMBER_DEFAULT_LANGUAGE_CODE (dafault: en-US)
         the language code to use for unauthenticated accesses
 
@@ -248,7 +249,7 @@ Tests
     Every file in the t folder is a suit of related tests concerning the same piece of the application.
 
     The tests don't corrupt the data that are in the permanent storage because they use 'mocked data'
-    database (this is achieved through in-memory db that are created on-the-fly when necessary).
+    databases (this is achieved through in-memory db that are created on-the-fly when necessary).
 
     Tests can also be run directly from the command line (without this CLI), using the standard 'prove'
     utility; you can see the file bat/run-tests.bat to get an idea about that.
@@ -272,7 +273,7 @@ API reference
         this endpoint expects to receive a csv-formated content in which every line has the id e the phone number;
         the content can be supplied both as a string parameter (name 'phoneNumbersList') and as a file upload 
         parameter (name: 'phoneNumbersFile'); the header line of the csv content is optional; 
-        output response: an array of JSON objects (see below), each of wich represents the result of the validation for every line
+        output response: an array of JSON objects (see below), each of which represents the result of the validation for every line
 
     GET /v1/getSingleNumberById
         request parameters: 'id'
@@ -280,7 +281,7 @@ API reference
     GET /v1/getSingleNumberAuditById
         request parameters: 'id'
         output response: an array of JSON objects (see below), each of wich represents the result of the validations
-        made on the object, added with audit informations
+        made on the object historically, added with audit informations (the user who made the action and when)
     
     GET /v1/testSingleNumber
         return an html page with a form by which you can validate a single number
@@ -305,15 +306,17 @@ API reference
     }
     The "audit" field is present only for getSingleNumberAuditById calls.
     The "result" field can contain 3 values: ACCEPTABLE, CORRECTED, INCORRECT
-    The "statusCode" and "statusDescription" are validator specific. For 'simple' validator statusCode can be 'OK' or 'KO' 
-    and resultDescription is always N/A. For 'standard'/'standardI18n' validators the codes are:
-    - I1: The phone number is incorrect because is neither a 'simple' one nor a 'deleted' one (i.e. with '_DELETE_' informations)
+    The "statusCode" and "statusDescription" are validator specific. For 'simple' validator statusCode can be
+    'OK' or 'KO' and resultDescription is always N/A. For 'standard'/'standardI18n' validators the codes are:
+    - I1: The phone number is incorrect because is neither 'deleted' one (i.e. with '_DELETE_'  informations) 
+        nor a 'simple' one (without); e.g. 27123123123_DELETED_123456789_DELETED_123456789
     - I2: The phone number has an incorrect format (it doesen't respect the base validation rule)
     - I3: The phone number is absent
-    - C1: The phone number has 'delete information' (but without date/time details)
-    - C2: The phone number has 'delete information' with date/time details (that are reported only in the description
-    - C3: The phone number has invalid 'delete information'
-    - A1: The number is correct
+    - C1: The phone number can be corrected: has 'delete information' (but without date/time details)
+    - C2: The phone number can be corrected: has 'delete information' with date/time details (that are reported 
+        only in the description)
+    - C3: The phone number can be corrected even if has invalid 'delete information'; e.g. 27123123123_DELETED_a
+    - A1: The phone number is correct
 
 Source code
 --------
@@ -326,17 +329,17 @@ Source code
         contains all the necessary to connect to the databases and to initialize the databases; the project
         uses 3 differt databases (one for users, one for phone numbers, and one for i18n) and the specific 
         code for every database is in a differet module in the Repository subdir; that code include all the
-        queryies that can be done and al the transformation from result-set to model objects (a mini ORM...)
+        queryies that can be done and al the transformation from result-set to model objects (a minimal ORM...)
     - 'Model'
         contains the class that define the domain of this project; the class are defined throgh the use
-        of the Moose module (a standard way to use a 'standard object oriented' paradigm in Perl)
+        of the Moose module (a way to use a 'standard object oriented' paradigm in Perl)
     - 'Logic'
         contains the classes that realize the business logic of the project; in particular the validators
         mechanism; in this packages ther're only reference to model and persistence object and nothing
         that refers to the way this logic is made usable (could be used by other code, by a service, with
         any type of transport protocol and format, etc.)
     - 'Rest'
-        this package expose le logic features throught a series of service endpoint
+        this package expose the logic features throught a series of service endpoint
 
 TODOs
 --------

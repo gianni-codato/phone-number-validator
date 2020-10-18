@@ -38,7 +38,8 @@ my $process_csv_lines = sub
     chomp($csvContent); # remove possible last empty line
     my @lines = split("\n", $csvContent);
     foreach my $line(@lines)
-    {   next if ($line eq '' || $line =~ m|^\s+$| || $line =~ 'id,sms_phone'); # header line
+    {   chomp($line);
+        next if ($line eq '' || $line =~ m|^\s+$| || $line =~ 'id,sms_phone'); # header line
         my($id, $raw_number) = split(',', $line);
         $processorSub->($id, $raw_number);
     }

@@ -104,10 +104,10 @@ sub insertOrReplaceValidation
 {   my $self = shift; my($validationResult, $user) = @_;
     Utils::Log::getLogger()->debug("Persistence::Repository::PhoneNumbers::insertOrReplaceValidation invoked");
 
-    $self->beginTran;
+    # $self->beginTran;
     my $old_value = $self->deleteValidationById($validationResult->phoneNumber->id);
     $self->insertValidation($validationResult, $user);
-    $self->commitTran;
+    # $self->commitTran;
 
     return $old_value;
 }
@@ -118,14 +118,15 @@ sub insertOrReplaceValidation
 # an object suitable for building a ValidatorResult object
 my $from_table_to_hash = sub
 {   my($row) = @_;
-    return 
+    my $retVal = 
     {   phoneNumber         => Model::PhoneNumber->new(id => $row->{id}, rawNum => $row->{raw_number}),
         validator           => Logic::ValidatorManager->getInstance->getValidator($row->{validator_name}),
         resultType          => $row->{result_type},
         resultCode          => $row->{validation_code},
         resultDescription   => $row->{validation_description},
-        normalizedNumber    => $row->{normalized_number},
     };
+    $retVal->{normalizedNumber} = $row->{normalized_number} if (defined($row->{normalized_number}));
+    return $retVal;
 };
 
 
