@@ -51,6 +51,7 @@ sub getCommand
         }
         elsif ($command eq 'setup')
         {   setup();
+            print "\nsetup completed";
         }
         elsif ($command eq 'run-tests')
         {   (my $prove = App::Prove->new)->process_args('-I.', '../t');
@@ -120,7 +121,6 @@ sub welcome
 
 Welcome to the Phone Number Exercise CLI
 Type 'help' for the list of available commands with a brief explanation
-Type 'help <command>' to a detailed explanation of a single command
 Type 'quit' or 'exit' to stop the CLI
 EOM
 }
@@ -251,7 +251,7 @@ Tests
     database (this is achieved through in-memory db that are created on-the-fly when necessary).
 
     Tests can also be run directly from the command line (without this CLI), using the standard 'prove'
-    utility; you can see the file bat\run-tests.bat to get an idea about that.
+    utility; you can see the file bat/run-tests.bat to get an idea about that.
 
 
 API reference

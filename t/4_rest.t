@@ -26,7 +26,7 @@ is(blessed($mojoApp), 'Mojolicious::Lite', 'testing mojo application retrieve');
 my $t = Test::Mojo->new($mojoApp);
 ok(defined($t), 'created a mojo test object');
 
-$t->post_ok('/checkSingleNumber', form => { id => 103343262, number => 27478342944 })
+$t->post_ok('/v1/checkSingleNumber', form => { id => 103343262, number => 27478342944 })
    ->status_is(200, 'checkSingleNumber: check response status')
    ->json_is(
         {   validation => 
@@ -49,7 +49,7 @@ id,sms_phone
 1033432,27478342944
 10334326,27478342944
 EOF
-$t->post_ok('/checkNumbers', form => { phoneNumbersList => $csvContent })
+$t->post_ok('/v1/checkNumbers', form => { phoneNumbersList => $csvContent })
    ->status_is(200, 'checkNumbers: check response status')
    ->json_is(
         [   {   validation => 
@@ -90,13 +90,13 @@ my $file_content;
     $log->debug('checkNumbers - example filec content' . $file_content);
 }
 my $form = { phoneNumbersFile => { filename => $file_name, content => $file_content } };
-$t->post_ok('/checkNumbers', form => $form)
+$t->post_ok('/v1/checkNumbers', form => $form)
     ->status_is(200, 'checkNumbers - example file');
 $log->debug('checkNumbers - example file' . Dumper($t->tx->res->body));
 
 
 
-$t->post_ok('/authenticate', form => { loginName => 'codato', password => 'gianni' })
+$t->post_ok('/v1/authenticate', form => { loginName => 'codato', password => 'gianni' })
    ->status_is(200, 'authenticate');
 my $jwtToken = $t->tx->res->body;
 is($jwtToken, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
@@ -106,19 +106,19 @@ is($jwtToken, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
 
 
 my $headers = { Authorization => "Bearer $jwtToken" };
-$t->post_ok('/checkSingleNumber' => $headers => form => { id => 103343262, number => 27478342944 })
+$t->post_ok('/v1/checkSingleNumber' => $headers => form => { id => 103343262, number => 27478342944 })
     ->status_is(200);
 $log->debug('checkSingleNumber - with authentication' . Dumper($t->tx->res->body));
 
 
 
-$t->post_ok('/checkSingleNumber' => $headers => form => { id => 103343262, number => 27478342944 })
+$t->post_ok('/v1/checkSingleNumber' => $headers => form => { id => 103343262, number => 27478342944 })
     ->status_is(200);
 
-$t->get_ok('/getSingleNumberById' => $headers => form => { id => 103343262 })
+$t->get_ok('/v1/getSingleNumberById' => $headers => form => { id => 103343262 })
     ->status_is(200);
 
-$t->get_ok('/getSingleNumberAuditById' => $headers => form => { id => 103343262 })
+$t->get_ok('/v1/getSingleNumberAuditById' => $headers => form => { id => 103343262 })
     ->status_is(200);
 
 

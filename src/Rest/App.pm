@@ -47,6 +47,9 @@ sub setValidator
 
 $build_app_instance = sub
 {
+    push @{app->static->paths} => 'Rest/static';
+    push @{app->static->paths} => '/Rest/static';
+
     # CORS stuffs
     app->hook(before_dispatch => sub 
     {   my $c = shift;
@@ -58,20 +61,20 @@ $build_app_instance = sub
     });
 
     # set-up routes
-    any ['GET'  ] => '/'                            => \&Rest::AppController::home;
-    any ['POST' ] => '/checkNumbers'                => \&Rest::AppController::checkNumbers;
-    any ['POST' ] => '/checkSingleNumber'           => \&Rest::AppController::checkSingleNumber;
-    any ['GET'  ] => '/testSingleNumber'            => \&Rest::AppController::testSingleNumber;
-    any ['GET'  ] => '/getSingleNumberById'         => \&Rest::AppController::getSingleNumberById;
-    any ['GET'  ] => '/getSingleNumberAuditById'    => \&Rest::AppController::getSingleNumberAuditById;
-    any ['POST' ] => '/authenticate'                => \&Rest::AppController::authenticate;
-    any ['OPTIONS'] => '/'                          => { text => 'OPTIONS!' };
-    any ['OPTIONS'] => '/checkNumbers'              => { text => 'OPTIONS!' };
-    any ['OPTIONS'] => '/checkSingleNumber'         => { text => 'OPTIONS!' };
-    any ['OPTIONS'] => '/testSingleNumber'          => { text => 'OPTIONS!' };
-    any ['OPTIONS'] => '/getSingleNumberById'       => { text => 'OPTIONS!' };
-    any ['OPTIONS'] => '/getSingleNumberAuditById'  => { text => 'OPTIONS!' };
-    any ['OPTIONS'] => '/authenticate'              => { text => 'OPTIONS!' };
+    any ['GET'  ] => '/'                               => \&Rest::AppController::home;
+    any ['POST' ] => '/v1/checkNumbers'                => \&Rest::AppController::checkNumbers;
+    any ['POST' ] => '/v1/checkSingleNumber'           => \&Rest::AppController::checkSingleNumber;
+    any ['GET'  ] => '/v1/testSingleNumber'            => \&Rest::AppController::testSingleNumber;
+    any ['GET'  ] => '/v1/getSingleNumberById'         => \&Rest::AppController::getSingleNumberById;
+    any ['GET'  ] => '/v1/getSingleNumberAuditById'    => \&Rest::AppController::getSingleNumberAuditById;
+    any ['POST' ] => '/v1/authenticate'                => \&Rest::AppController::authenticate;
+    any ['OPTIONS'] => '/'                             => { text => 'OPTIONS!' };
+    any ['OPTIONS'] => '/v1/checkNumbers'              => { text => 'OPTIONS!' };
+    any ['OPTIONS'] => '/v1/checkSingleNumber'         => { text => 'OPTIONS!' };
+    any ['OPTIONS'] => '/v1/testSingleNumber'          => { text => 'OPTIONS!' };
+    any ['OPTIONS'] => '/v1/getSingleNumberById'       => { text => 'OPTIONS!' };
+    any ['OPTIONS'] => '/v1/getSingleNumberAuditById'  => { text => 'OPTIONS!' };
+    any ['OPTIONS'] => '/v1/authenticate'              => { text => 'OPTIONS!' };
     
     # connect the http server log to the entire application log
     my $logger = Utils::Log::getLogger();
