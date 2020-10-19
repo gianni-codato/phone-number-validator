@@ -1,0 +1,13 @@
+SOURCE REPOSITORY
+http://github.com/jberger/Mojo-JWT
+
+AUTHOR
+Joel Berger, <joel.a.berger@gmail.com>
+
+CONTRIBUTORS
+Christopher Raa (mishanti1)
+
+COPYRIGHT AND LICENSE
+Copyright (C) 2015 by "AUTHOR" and "CONTRIBTORS".
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
